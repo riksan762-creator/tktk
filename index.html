@@ -2,135 +2,182 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
-    <title>Riksan Project | Premium TikTok Downloader</title>
+    <title>Riksan Project | TikTok Downloader</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
-        .premium-card {
-            background: rgba(255, 255, 255, 0.95);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(10px);
             border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .input-group {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
+        .btn-gradient {
+            background: linear-gradient(90deg, #6366f1, #d946ef);
             transition: all 0.3s ease;
         }
 
-        .input-group:focus-within {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        .btn-gradient:active {
+            transform: scale(0.98);
         }
 
-        .btn-download {
-            background: linear-gradient(90deg, #6366f1, #d946ef);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-download:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
-        }
-
-        .result-container {
-            animation: slideUp 0.5s ease-out forwards;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loader-dot {
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        /* Responsive Fix for iPhone */
+        @supports (-webkit-touch-callout: none) {
+            .min-h-screen { min-height: -webkit-fill-available; }
         }
     </style>
 </head>
-<body class="flex flex-col items-center px-4 py-10">
+<body class="flex flex-col items-center px-4 py-8">
 
-    <div class="w-full max-w-xl space-y-8">
+    <div class="w-full max-w-lg space-y-6">
         
-        <header class="text-center text-white space-y-2">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Download video TikTok</h1>
-            <p class="text-white/80 font-medium">Tanpa Watermark, Cepat, dan Gratis</p>
+        <header class="text-center text-white pt-6">
+            <h1 class="text-3xl font-extrabold tracking-tight">RIKSAN PROJECT</h1>
+            <p class="text-white/80 text-sm mt-1">TikTok Downloader No Watermark</p>
         </header>
 
-        <div class="premium-card p-6 md:p-8 space-y-4">
-            <div class="input-group flex items-center rounded-2xl px-4 py-1">
-                <input type="text" id="tiktokUrl" placeholder="Tempel tautan video di sini" 
-                    class="w-full bg-transparent py-4 text-slate-700 outline-none font-medium">
-                <button id="btnPaste" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl transition-all font-bold text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg> Tempel
+        <div class="glass-card p-6 shadow-xl">
+            <div class="space-y-4">
+                <div class="flex items-center bg-slate-100 border-2 border-slate-200 rounded-2xl px-4 py-1 focus-within:border-indigo-500">
+                    <input type="text" id="tiktokUrl" placeholder="Tempel tautan video..." 
+                        class="w-full bg-transparent py-4 text-slate-800 outline-none font-medium">
+                    <button id="btnPaste" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl text-xs font-bold active:bg-indigo-200">
+                        TEMPEL
+                    </button>
+                </div>
+
+                <button id="btnAction" class="btn-gradient w-full text-white font-bold py-5 rounded-2xl text-lg shadow-lg">
+                    DOWNLOAD VIDEO
                 </button>
             </div>
-
-            <button id="btnAction" class="btn-download w-full text-white font-bold py-5 rounded-2xl text-lg tracking-wide uppercase">
-                Download
-            </button>
         </div>
 
-        <div id="loader" class="hidden text-center py-10">
-            <div class="inline-flex space-x-2">
-                <div class="h-3 w-3 bg-white rounded-full loader-dot"></div>
-                <div class="h-3 w-3 bg-white rounded-full loader-dot" style="animation-delay: 0.2s"></div>
-                <div class="h-3 w-3 bg-white rounded-full loader-dot" style="animation-delay: 0.4s"></div>
-            </div>
-            <p class="text-white font-bold mt-4 text-sm tracking-widest uppercase">Sedang Menghubungkan...</p>
+        <div id="loader" class="hidden text-center py-4">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-white border-r-transparent"></div>
+            <p class="text-white text-xs font-bold mt-2 animate-pulse">MEMPROSES...</p>
         </div>
 
-        <div id="result" class="hidden result-container premium-card overflow-hidden">
-            <div class="md:flex">
-                <div class="md:w-1/3">
-                    <img id="thumb" src="" class="h-full w-full object-cover">
+        <div id="result" class="hidden glass-card overflow-hidden animate-bounce-in">
+            <img id="thumb" src="" class="w-full aspect-video object-cover">
+            <div class="p-6 space-y-4">
+                <div>
+                    <h3 id="author" class="text-indigo-600 font-bold"></h3>
+                    <p id="desc" class="text-slate-500 text-xs line-clamp-2 mt-1"></p>
                 </div>
-                <div class="p-6 md:w-2/3 space-y-4 flex flex-col justify-center">
-                    <div>
-                        <h3 id="author" class="text-indigo-600 font-bold text-xl"></h3>
-                        <p id="desc" class="text-slate-500 text-sm line-clamp-2 mt-1 font-medium"></p>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        <a id="downloadLink" href="#" class="btn-download block w-full text-white text-center font-bold py-4 rounded-xl shadow-lg">
-                            Download Tanpa Watermark
-                        </a>
-                        <button onclick="location.reload()" class="block w-full text-slate-400 text-center font-bold py-2 text-xs uppercase tracking-widest hover:text-indigo-600 transition-all">
-                            Download Video Lain
-                        </button>
-                    </div>
-                </div>
+                <a id="downloadLink" href="#" class="btn-gradient block w-full text-white text-center font-bold py-4 rounded-xl shadow-lg">
+                    SIMPAN VIDEO KE GALERI
+                </a>
             </div>
         </div>
 
-        <div class="text-center text-white/70 space-y-6 pt-10">
-            <h2 class="text-2xl font-bold text-white">Akses Tanpa Batas</h2>
-            <p class="max-w-md mx-auto leading-relaxed">Nikmati kebebasan untuk download video tiktok no watermark sebanyak yang Anda inginkan, tanpa ada batasan.</p>
-        </div>
-
-        <footer class="text-center pb-10">
-            <p class="text-white/40 text-[10px] font-bold tracking-[0.4em] uppercase">Built by Riksan Project &copy; 2026</p>
+        <footer class="text-center text-white/50 text-[10px] font-bold tracking-[0.3em] pt-10">
+            &copy; 2026 RIKSAN PROJECT • CTO EDITION
         </footer>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        const btnAction = document.getElementById('btnAction');
+        const btnPaste = document.getElementById('btnPaste');
+        const tiktokInput = document.getElementById('tiktokUrl');
+        const loader = document.getElementById('loader');
+        const resultArea = document.getElementById('result');
+        const downloadBtn = document.getElementById('downloadLink');
+
+        // FUNGSI BERSIHKAN URL (Fix NXDOMAIN)
+        const getCleanUrl = (path) => {
+            if (!path) return "";
+            if (path.includes('https://')) {
+                return path.substring(path.lastIndexOf('https://'));
+            }
+            return `https://www.tikwm.com${path}`;
+        };
+
+        // FITUR PASTE (Aman di Android & iPhone)
+        btnPaste.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                tiktokInput.value = text;
+            } catch (err) {
+                tiktokInput.focus();
+                alert("Silakan tempel manual, Bos (Klik tahan kotaknya).");
+            }
+        });
+
+        // LOGIKA AMBIL DATA
+        btnAction.addEventListener('click', async () => {
+            const rawUrl = tiktokInput.value.trim();
+            if (!rawUrl) return alert('Link-nya mana?');
+
+            btnAction.disabled = true;
+            btnAction.innerText = 'WAIT...';
+            loader.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+
+            try {
+                const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(rawUrl)}`);
+                const json = await res.json();
+
+                if (json.data) {
+                    const v = json.data;
+                    document.getElementById('thumb').src = getCleanUrl(v.cover);
+                    document.getElementById('author').innerText = "@" + (v.author.nickname || "User");
+                    document.getElementById('desc').innerText = v.title || "";
+                    
+                    // Pasang link video
+                    downloadBtn.href = getCleanUrl(v.play);
+                    resultArea.classList.remove('hidden');
+                } else {
+                    alert("Gagal ambil video!");
+                }
+            } catch (e) {
+                alert("Koneksi Error!");
+            } finally {
+                btnAction.disabled = false;
+                btnAction.innerText = 'DOWNLOAD VIDEO';
+                loader.classList.add('hidden');
+            }
+        });
+
+        // DOWNLOAD KE GALERI
+        downloadBtn.addEventListener('click', async (e) => {
+            // Untuk iPhone/Safari, kita biarkan browser menangani linknya
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                return true; 
+            }
+
+            // Untuk Android/Chrome, kita pakai Blob agar langsung download
+            e.preventDefault();
+            const url = downloadBtn.href;
+            try {
+                downloadBtn.innerText = "SEDANG MENGUNDUH...";
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const bUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = bUrl;
+                a.download = `RiksanProject_${Date.now()}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(bUrl);
+            } catch (err) {
+                window.open(url, '_blank');
+            } finally {
+                downloadBtn.innerText = "SIMPAN VIDEO KE GALERI";
+            }
+        });
+    </script>
 </body>
 </html>
