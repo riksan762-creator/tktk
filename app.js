@@ -1,40 +1,36 @@
-/**
- * Riksan Project - TikTok Downloader Engine v3.0
- * Ultra-Responsive & Auto-Clean URL Logic
- */
-
 const btnAction = document.getElementById('btnAction');
+const btnPaste = document.getElementById('btnPaste');
 const tiktokInput = document.getElementById('tiktokUrl');
 const loader = document.getElementById('loader');
 const resultArea = document.getElementById('result');
 const downloadBtn = document.getElementById('downloadLink');
 
-// Fungsi Pembersih URL (Anti-Error NXDOMAIN)
-const getCleanUrl = (path) => {
+// Fix URL Logic: Membersihkan link agar tidak double (Solusi NXDOMAIN)
+const cleanUrl = (path) => {
     if (!path) return "";
-    // Jika API memberikan link yang sudah ada https-nya di tengah (akibat double domain)
+    // Jika path berantakan (mengandung https dobel), ambil link terakhir
     if (path.includes('https://')) {
         return path.substring(path.lastIndexOf('https://'));
     }
-    // Jika hanya path folder, tambahkan domain TikWM
-    if (path.startsWith('/')) {
-        return `https://www.tikwm.com${path}`;
-    }
-    return path;
+    // Jika path hanya folder, sambungkan ke domain tikwm
+    return `https://www.tikwm.com${path}`;
 };
+
+// Fitur Paste Otomatis
+btnPaste.addEventListener('click', async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        tiktokInput.value = text;
+    } catch (err) {
+        alert("Gagal mengakses clipboard. Silakan tempel manual.");
+    }
+});
 
 btnAction.addEventListener('click', async () => {
     const rawUrl = tiktokInput.value.trim();
-    if (!rawUrl) return alert('Link-nya mana, Bos?');
+    if (!rawUrl) return alert('Silakan tempel tautan video dulu!');
 
-    // UI Feedback Modern
     btnAction.disabled = true;
-    btnAction.innerHTML = `<span class="flex items-center justify-center gap-2">
-        <svg class="animate-spin h-5 w-5 text-slate-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg> MEMPROSES...</span>`;
-    
     loader.classList.remove('hidden');
     resultArea.classList.add('hidden');
 
@@ -45,71 +41,62 @@ btnAction.addEventListener('click', async () => {
         if (result && result.data) {
             const v = result.data;
 
-            // Bersihkan Link Video & Thumbnail
-            const finalVideo = getCleanUrl(v.play);
-            const finalThumb = getCleanUrl(v.cover);
+            // Bersihkan data URL
+            const finalVideo = cleanUrl(v.play);
+            const finalThumb = cleanUrl(v.cover);
 
-            // Update UI
             document.getElementById('thumb').src = finalThumb;
             document.getElementById('author').innerText = "@" + (v.author.nickname || "TikTok User");
-            document.getElementById('desc').innerText = v.title || "Video Berhasil Diambil";
+            document.getElementById('desc').innerText = v.title || "Berhasil memproses video";
             
-            // Masukkan link bersih ke tombol download
             downloadBtn.href = finalVideo;
             
             resultArea.classList.remove('hidden');
-            resultArea.classList.add('fade-up');
+            resultArea.scrollIntoView({ behavior: 'smooth' });
         } else {
-            alert('Gagal: ' + (result.msg || 'Video tidak ditemukan!'));
+            alert('Video tidak ditemukan atau link salah!');
         }
     } catch (err) {
-        alert('Koneksi ke API TikWM Bermasalah!');
+        alert('Terjadi kesalahan jaringan!');
     } finally {
         btnAction.disabled = false;
-        btnAction.innerText = 'AMBIL VIDEO';
         loader.classList.add('hidden');
     }
 });
 
-/**
- * PRO DOWNLOADER LOGIC (Chrome Optimized)
- */
+// Download Logic (Chrome Optimized)
 downloadBtn.addEventListener('click', async (e) => {
     e.preventDefault();
-    const videoUrl = downloadBtn.href;
-    if (!videoUrl || videoUrl.includes('#')) return;
+    const url = downloadBtn.href;
+    if (!url || url.includes('#')) return;
 
     const originalText = downloadBtn.innerText;
     
     try {
         downloadBtn.innerText = "SEDANG MENGUNDUH...";
-        downloadBtn.classList.add('opacity-50', 'pointer-events-none');
+        downloadBtn.style.pointerEvents = "none";
 
-        // Menarik data video langsung ke browser
-        const res = await fetch(videoUrl);
+        const res = await fetch(url);
         const blob = await res.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
+        const bUrl = window.URL.createObjectURL(blob);
         
-        // Memicu browser Chrome untuk download otomatis
-        const tempLink = document.createElement('a');
-        tempLink.href = blobUrl;
-        tempLink.setAttribute('download', `RiksanProject_${Date.now()}.mp4`);
-        document.body.appendChild(tempLink);
-        tempLink.click();
+        const a = document.createElement('a');
+        a.href = bUrl;
+        a.download = `RiksanProject_${Date.now()}.mp4`;
+        document.body.appendChild(a);
+        a.click();
         
-        // Cleanup memori
         setTimeout(() => {
-            document.body.removeChild(tempLink);
-            window.URL.revokeObjectURL(blobUrl);
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(bUrl);
         }, 100);
 
+        alert("Video berhasil disimpan!");
     } catch (err) {
-        // Fallback jika fetch diblokir browser: Buka di tab baru untuk save manual
-        window.open(videoUrl, '_blank');
+        window.open(url, '_blank');
+        alert("Video dibuka di tab baru. Silakan simpan manual jika unduhan tidak dimulai.");
     } finally {
-        setTimeout(() => {
-            downloadBtn.innerText = "DOWNLOAD NO WATERMARK";
-            downloadBtn.classList.remove('opacity-50', 'pointer-events-none');
-        }, 1000);
+        downloadBtn.innerText = originalText;
+        downloadBtn.style.pointerEvents = "auto";
     }
 });
