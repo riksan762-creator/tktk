@@ -1,44 +1,61 @@
+/**
+ * Riksan Project - TikTok Downloader Engine v2.5
+ * Optimized for GitHub Pages & Direct Download
+ */
+
 const btnAction = document.getElementById('btnAction');
 const tiktokInput = document.getElementById('tiktokUrl');
 const loader = document.getElementById('loader');
 const resultArea = document.getElementById('result');
 const downloadBtn = document.getElementById('downloadLink');
 
-// Base URL TikWM
-const apiBase = "https://www.tikwm.com";
+// Fungsi Pintar: Mencegah Link Double/Tabrakan
+const fixUrl = (path) => {
+    if (!path) return "";
+    // Jika path sudah ada 'http', artinya sudah lengkap dari API
+    if (path.startsWith('http')) return path;
+    // Jika belum, baru tambahkan domain TikWM
+    return `https://www.tikwm.com${path}`;
+};
 
 btnAction.addEventListener('click', async () => {
     const rawUrl = tiktokInput.value.trim();
-    if (!rawUrl) return alert('Link-nya mana, Bos?');
+    if (!rawUrl) return alert('Paste link TikTok dulu, Bos!');
 
-    // Reset UI
+    // UI Feedback
     btnAction.disabled = true;
-    btnAction.innerText = 'MEMPROSES...';
+    btnAction.innerHTML = `<span>MEMPROSES...</span>`;
     loader.classList.remove('hidden');
     resultArea.classList.add('hidden');
 
     try {
-        // Tembak API TikWM langsung dari browser (Client-side)
-        const response = await fetch(`${apiBase}/api/?url=${encodeURIComponent(rawUrl)}`);
+        // Tembak API TikWM
+        const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(rawUrl)}`);
         const result = await response.json();
 
         if (result && result.data) {
             const v = result.data;
 
-            // Masukkan data ke UI
-            document.getElementById('thumb').src = apiBase + v.cover;
+            // Pastikan URL bersih sebelum dimasukkan ke UI
+            const finalThumb = fixUrl(v.cover);
+            const finalVideo = fixUrl(v.play); // 'play' adalah No Watermark
+
+            // Update Tampilan
+            document.getElementById('thumb').src = finalThumb;
             document.getElementById('author').innerText = "@" + (v.author.nickname || "User");
-            document.getElementById('desc').innerText = v.title || "TikTok Video";
+            document.getElementById('desc').innerText = v.title || "TikTok Video Berhasil Diambil";
             
-            // Link download bersih (No Watermark)
-            downloadBtn.href = apiBase + v.play;
+            // Masukkan link video ke tombol
+            downloadBtn.href = finalVideo;
             
             resultArea.classList.remove('hidden');
+            resultArea.scrollIntoView({ behavior: 'smooth' });
         } else {
-            alert('Gagal: Video tidak ditemukan atau private!');
+            alert('Gagal: ' + (result.msg || 'Video tidak ditemukan!'));
         }
     } catch (err) {
-        alert('Koneksi Error: Pastikan internet lancar!');
+        alert('Koneksi Error: Gagal terhubung ke API TikWM.');
+        console.error(err);
     } finally {
         btnAction.disabled = false;
         btnAction.innerText = 'AMBIL VIDEO';
@@ -46,34 +63,50 @@ btnAction.addEventListener('click', async () => {
     }
 });
 
-// Fitur Download Otomatis ke Galeri
+/**
+ * LOGIKA DOWNLOAD LANGSUNG KE GALERI
+ * Menggunakan Blob untuk memicu sistem "Save As"
+ */
 downloadBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     const url = downloadBtn.href;
-    if (!url || url === "#") return;
+    if (!url || url.includes('#')) return;
+
+    const originalText = downloadBtn.innerText;
 
     try {
-        downloadBtn.innerText = "MENGUNDUH...";
-        downloadBtn.style.opacity = "0.5";
+        // UI Loading saat download
+        downloadBtn.innerText = "MENGUNDUH KE GALERI...";
+        downloadBtn.classList.add('opacity-50', 'pointer-events-none');
 
-        const res = await fetch(url);
-        const blob = await res.blob();
-        const bUrl = window.URL.createObjectURL(blob);
+        // 1. Ambil data video secara silent
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Download gagal');
+        const blob = await response.blob();
         
+        // 2. Buat URL bayangan di memori
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        // 3. Picu Trigger Download
         const a = document.createElement('a');
-        a.href = bUrl;
+        a.href = blobUrl;
+        // Nama file custom biar keren pas di galeri
         a.download = `RiksanProject_${Date.now()}.mp4`;
         document.body.appendChild(a);
         a.click();
         
-        window.URL.revokeObjectURL(bUrl);
+        // 4. Bersihkan memori browser
         document.body.removeChild(a);
-        alert("Berhasil disimpan ke galeri!");
+        window.URL.revokeObjectURL(blobUrl);
+        
+        alert("Berhasil! Video sudah tersimpan di Galeri/Download.");
     } catch (err) {
+        // Fallback: Jika kena blokir CORS/Kebijakan browser
+        console.warn("Direct download failed, opening in new tab...");
         window.open(url, '_blank');
-        alert("Klik tahan video lalu pilih 'Simpan'.");
+        alert("Video dibuka di tab baru. Silakan klik tahan videonya lalu pilih 'Simpan Video'.");
     } finally {
-        downloadBtn.innerText = "DOWNLOAD NO WATERMARK";
-        downloadBtn.style.opacity = "1";
+        downloadBtn.innerText = originalText;
+        downloadBtn.classList.remove('opacity-50', 'pointer-events-none');
     }
 });
