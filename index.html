@@ -3,181 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="referrer" content="no-referrer">
-    <title>Riksan Project | TikTok Downloader</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>SawargiPay | Sawargipay v6</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(10px);
-            border-radius: 2rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .btn-gradient {
-            background: linear-gradient(90deg, #6366f1, #d946ef);
-            transition: all 0.3s ease;
-        }
-
-        .btn-gradient:active {
-            transform: scale(0.98);
-        }
-
-        /* Responsive Fix for iPhone */
-        @supports (-webkit-touch-callout: none) {
-            .min-h-screen { min-height: -webkit-fill-available; }
-        }
+        :root { --bg: #05070a; --card: #0d1117; --accent: #3b82f6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: #f0f6fc; touch-action: manipulation; }
+        .glass { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
+        .input-pro { background: #161b22 !important; border: 1px solid #30363d !important; border-radius: 12px !important; color: white !important; font-weight: 700; transition: 0.2s; }
+        .input-pro:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        .btn-update { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); }
+        .btn-wd { background: linear-gradient(135deg, #da3633 0%, #f85149 100%); }
+        /* Hilangkan spinner number */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .status-pill { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
     </style>
 </head>
-<body class="flex flex-col items-center px-4 py-8">
+<body class="p-4 md:p-10 min-h-screen">
 
-    <div class="w-full max-w-lg space-y-6">
-        
-        <header class="text-center text-white pt-6">
-            <h1 class="text-3xl font-extrabold tracking-tight">RIKSAN PROJECT</h1>
-            <p class="text-white/80 text-sm mt-1">TikTok Downloader No Watermark</p>
-        </header>
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-xl font-black tracking-tighter italic uppercase text-blue-500">Sawar<span class="text-white not-italic">gipay</span></h1>
+                <p id="clock" class="text-[9px] font-bold text-slate-500 tracking-[0.3em] mt-1"></p>
+            </div>
+            <button onclick="exportToExcel()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Excel Export</button>
+        </div>
 
-        <div class="glass-card p-6 shadow-xl">
-            <div class="space-y-4">
-                <div class="flex items-center bg-slate-100 border-2 border-slate-200 rounded-2xl px-4 py-1 focus-within:border-indigo-500">
-                    <input type="text" id="tiktokUrl" placeholder="Tempel tautan video..." 
-                        class="w-full bg-transparent py-4 text-slate-800 outline-none font-medium">
-                    <button id="btnPaste" class="bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl text-xs font-bold active:bg-indigo-200">
-                        TEMPEL
-                    </button>
-                </div>
-
-                <button id="btnAction" class="btn-gradient w-full text-white font-bold py-5 rounded-2xl text-lg shadow-lg">
-                    DOWNLOAD VIDEO
-                </button>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div class="glass p-6 border-l-4 border-blue-500">
+                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Auto Gopay</p>
+                <h2 id="disp-gopay" class="text-xl font-extrabold italic">Rp 0</h2>
+            </div>
+            <div class="glass p-6 border-l-4 border-indigo-500">
+                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Tripay Engine</p>
+                <h2 id="disp-tripay" class="text-xl font-extrabold italic">Rp 0</h2>
+            </div>
+            <div class="glass p-6 border-l-4 border-rose-500">
+                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Qiospay Gateway</p>
+                <h2 id="disp-qiospay" class="text-xl font-extrabold italic">Rp 0</h2>
+            </div>
+            <div class="glass p-6 bg-gradient-to-br from-blue-600 to-indigo-700 border-none">
+                <p class="text-blue-100 text-[9px] font-black uppercase tracking-widest mb-2">Net Liquidity</p>
+                <h2 id="disp-total" class="text-xl font-extrabold italic text-white">Rp 0</h2>
             </div>
         </div>
 
-        <div id="loader" class="hidden text-center py-4">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-white border-r-transparent"></div>
-            <p class="text-white text-xs font-bold mt-2 animate-pulse">MEMPROSES...</p>
-        </div>
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <div class="glass p-8 sticky top-8 border-t-2 border-blue-500/50">
+                    <div class="flex bg-black/40 p-1 rounded-xl mb-6">
+                        <button id="m-up" onclick="setMode('UPDATE')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600">Update Saldo</button>
+                        <button id="m-wd" onclick="setMode('WD')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500">Penarikan (WD)</button>
+                    </div>
 
-        <div id="result" class="hidden glass-card overflow-hidden animate-bounce-in">
-            <img id="thumb" src="" class="w-full aspect-video object-cover">
-            <div class="p-6 space-y-4">
-                <div>
-                    <h3 id="author" class="text-indigo-600 font-bold"></h3>
-                    <p id="desc" class="text-slate-500 text-xs line-clamp-2 mt-1"></p>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Gateway</label>
+                            <select id="in-gw" class="w-full p-4 input-pro text-sm">
+                                <option value="Gopay">Auto Gopay</option>
+                                <option value="Tripay">Tripay Engine</option>
+                                <option value="Qiospay">Qiospay Gateway</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label id="lbl-nom" class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Nominal Saldo</label>
+                            <input type="text" id="in-nom" oninput="formatInput(this)" placeholder="0" class="w-full p-4 text-xl input-pro">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Catatan Mutasi</label>
+                            <input type="text" id="in-note" placeholder="..." class="w-full p-4 text-sm input-pro font-normal">
+                        </div>
+                        <button id="btn-sub" onclick="process()" class="w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4">Simpan Laporan</button>
+                    </div>
                 </div>
-                <a id="downloadLink" href="#" class="btn-gradient block w-full text-white text-center font-bold py-4 rounded-xl shadow-lg">
-                    SIMPAN VIDEO KE GALERI
-                </a>
+            </div>
+
+            <div class="lg:col-span-2 glass overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Audit Trail Ledger</h3>
+                    <button onclick="clearDB()" class="text-[9px] font-bold text-red-500 opacity-40 hover:opacity-100 uppercase">Clear All</button>
+                </div>
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/60 sticky top-0">
+                            <tr>
+                                <th class="p-6">Timestamp</th>
+                                <th class="p-6">Mutasi</th>
+                                <th class="p-6">Nominal</th>
+                                <th class="p-6 text-right">Gateway</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-body" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
-        <footer class="text-center text-white/50 text-[10px] font-bold tracking-[0.3em] pt-10">
-            &copy; 2026 RIKSAN PROJECT • CTO EDITION
-        </footer>
     </div>
 
     <script>
-        const btnAction = document.getElementById('btnAction');
-        const btnPaste = document.getElementById('btnPaste');
-        const tiktokInput = document.getElementById('tiktokUrl');
-        const loader = document.getElementById('loader');
-        const resultArea = document.getElementById('result');
-        const downloadBtn = document.getElementById('downloadLink');
+        let db = JSON.parse(localStorage.getItem('swg_ledger_v6')) || [];
+        let mode = 'UPDATE';
 
-        // FUNGSI BERSIHKAN URL (Fix NXDOMAIN)
-        const getCleanUrl = (path) => {
-            if (!path) return "";
-            if (path.includes('https://')) {
-                return path.substring(path.lastIndexOf('https://'));
+        function setMode(m) {
+            mode = m;
+            const up = document.getElementById('m-up');
+            const wd = document.getElementById('m-wd');
+            const sub = document.getElementById('btn-sub');
+            const lbl = document.getElementById('lbl-nom');
+
+            if(m === 'UPDATE') {
+                up.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600 text-white";
+                wd.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500";
+                sub.className = "w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white";
+                lbl.innerText = "Nominal Saldo Terkini";
+            } else {
+                wd.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-red-600 text-white";
+                up.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500";
+                sub.className = "w-full btn-wd py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white";
+                lbl.innerText = "Nominal Penarikan (WD)";
             }
-            return `https://www.tikwm.com${path}`;
-        };
+        }
 
-        // FITUR PASTE (Aman di Android & iPhone)
-        btnPaste.addEventListener('click', async () => {
-            try {
-                const text = await navigator.clipboard.readText();
-                tiktokInput.value = text;
-            } catch (err) {
-                tiktokInput.focus();
-                alert("Silakan tempel manual, Bos (Klik tahan kotaknya).");
-            }
-        });
+        function formatInput(el) {
+            let val = el.value.replace(/\D/g, "");
+            el.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-        // LOGIKA AMBIL DATA
-        btnAction.addEventListener('click', async () => {
-            const rawUrl = tiktokInput.value.trim();
-            if (!rawUrl) return alert('Link-nya mana?');
+        function toNum(str) { return parseInt(str.replace(/\./g, "")) || 0; }
+        function toIDR(num) { return "Rp " + num.toLocaleString('id-ID'); }
 
-            btnAction.disabled = true;
-            btnAction.innerText = 'WAIT...';
-            loader.classList.remove('hidden');
-            resultArea.classList.add('hidden');
+        function process() {
+            const nomStr = document.getElementById('in-nom').value;
+            const val = toNum(nomStr);
+            const gw = document.getElementById('in-gw').value;
+            const note = document.getElementById('in-note').value || '-';
 
-            try {
-                const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(rawUrl)}`);
-                const json = await res.json();
+            if(val <= 0) return alert("Nominal tidak valid!");
 
-                if (json.data) {
-                    const v = json.data;
-                    document.getElementById('thumb').src = getCleanUrl(v.cover);
-                    document.getElementById('author').innerText = "@" + (v.author.nickname || "User");
-                    document.getElementById('desc').innerText = v.title || "";
-                    
-                    // Pasang link video
-                    downloadBtn.href = getCleanUrl(v.play);
-                    resultArea.classList.remove('hidden');
+            const entry = {
+                id: Date.now(),
+                mode, gw, val, note,
+                date: new Date().toLocaleDateString('id-ID'),
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+            };
+
+            db.unshift(entry);
+            localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
+            render();
+            
+            document.getElementById('in-nom').value = '';
+            document.getElementById('in-note').value = '';
+        }
+
+        function render() {
+            const body = document.getElementById('log-body');
+            body.innerHTML = '';
+            
+            let balances = { Gopay: 0, Tripay: 0, Qiospay: 0 };
+
+            // LOGIC PINTAR: Saldo Akhir = Update Terakhir - Total WD sejak update tersebut
+            ['Gopay', 'Tripay', 'Qiospay'].forEach(g => {
+                const logs = db.filter(i => i.gw === g);
+                let currentBal = 0;
+                
+                // Cari update saldo terbaru
+                const lastUpdateIdx = logs.findIndex(i => i.mode === 'UPDATE');
+                
+                if (lastUpdateIdx !== -1) {
+                    currentBal = logs[lastUpdateIdx].val;
+                    // Kurangi dengan semua WD yang terjadi SETELAH update tersebut
+                    for (let i = 0; i < lastUpdateIdx; i++) {
+                        if (logs[i].mode === 'WD') currentBal -= logs[i].val;
+                    }
                 } else {
-                    alert("Gagal ambil video!");
+                    // Jika belum ada update, hitung WD sebagai minus (opsional)
+                    logs.forEach(i => { if(i.mode === 'WD') currentBal -= i.val; });
                 }
-            } catch (e) {
-                alert("Koneksi Error!");
-            } finally {
-                btnAction.disabled = false;
-                btnAction.innerText = 'DOWNLOAD VIDEO';
-                loader.classList.add('hidden');
-            }
-        });
 
-        // DOWNLOAD KE GALERI
-        downloadBtn.addEventListener('click', async (e) => {
-            // Untuk iPhone/Safari, kita biarkan browser menangani linknya
-            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                return true; 
-            }
+                balances[g] = currentBal;
+                document.getElementById(`disp-${g.toLowerCase()}`).innerText = toIDR(currentBal);
+            });
 
-            // Untuk Android/Chrome, kita pakai Blob agar langsung download
-            e.preventDefault();
-            const url = downloadBtn.href;
-            try {
-                downloadBtn.innerText = "SEDANG MENGUNDUH...";
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const bUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = bUrl;
-                a.download = `RiksanProject_${Date.now()}.mp4`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(bUrl);
-            } catch (err) {
-                window.open(url, '_blank');
-            } finally {
-                downloadBtn.innerText = "SIMPAN VIDEO KE GALERI";
+            const total = balances.Gopay + balances.Tripay + balances.Qiospay;
+            document.getElementById('disp-total').innerText = toIDR(total);
+
+            db.forEach(item => {
+                const isWD = item.mode === 'WD';
+                body.innerHTML += `
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="p-6">
+                            <p class="font-bold text-white text-xs">${item.date}</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">${item.time} WIB</p>
+                        </td>
+                        <td class="p-6">
+                            <span class="status-pill ${isWD ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}">
+                                ${isWD ? 'Withdraw' : 'Update'}
+                            </span>
+                        </td>
+                        <td class="p-6 font-bold ${isWD ? 'text-red-400' : 'text-white'} text-sm italic">
+                            ${isWD ? '-' : ''}${toIDR(item.val)}
+                            <p class="text-[9px] text-slate-600 not-italic font-medium mt-1 uppercase">${item.note}</p>
+                        </td>
+                        <td class="p-6 text-right font-black uppercase text-blue-500 text-[10px] tracking-widest">
+                            ${item.gw}
+                            <button onclick="del(${item.id})" class="ml-4 text-slate-800 hover:text-red-500 transition-colors">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function del(id) {
+            if(confirm("Hapus log ini?")) {
+                db = db.filter(i => i.id !== id);
+                localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
+                render();
             }
-        });
+        }
+
+        function clearDB() {
+            if(confirm("Hapus total data?")) {
+                db = []; localStorage.clear(); render();
+            }
+        }
+
+        function exportToExcel() {
+            if(db.length === 0) return alert("Data kosong!");
+            const exportData = db.map(i => ({
+                TANGGAL: i.date, WAKTU: i.time, GATEWAY: i.gw,
+                TIPE: i.mode === 'UPDATE' ? 'MASUK/UPDATE' : 'PENARIKAN',
+                NOMINAL: i.val, CATATAN: i.note
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Financial_Report");
+            XLSX.writeFile(wb, `SawargiPay_Final_Report.xlsx`);
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        }, 1000);
+
+        window.onload = render;
     </script>
 </body>
 </html>
