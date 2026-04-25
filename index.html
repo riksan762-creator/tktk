@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v8 | Pro Management</title>
+    <title>SawargiPay v8 | Ultra-Light Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
         .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 12px !important; outline: none !important; transition: all 0.2s; }
         
-        /* Tema Warna Input Dinamis */
+        /* Focus Colors */
         .focus-blue:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         .focus-amber:focus { border-color: #f59e0b !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
         .focus-indigo:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
@@ -63,12 +63,12 @@
                 <span class="text-[9px] font-bold text-indigo-600 uppercase tracking-widest">Tripay Tersedia</span>
                 <h3 id="bal-tr" class="text-xl font-black text-indigo-900 mt-1">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/30">
+            <div class="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/20">
                 <span class="text-[9px] font-bold text-amber-600 uppercase tracking-widest">Tripay Kliring</span>
                 <h3 id="bal-tk" class="text-xl font-black text-amber-700 mt-1">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 bg-slate-900 border-none">
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Net Asset</span>
+            <div class="glass-card p-5 bg-blue-600 border-none shadow-blue-200 shadow-lg">
+                <span class="text-[9px] font-bold text-blue-100 uppercase tracking-widest">Total Net Asset</span>
                 <h3 id="bal-total" class="text-xl font-black text-white italic mt-1">Rp 0</h3>
             </div>
         </div>
@@ -144,6 +144,7 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('f-date').valueAsDate = new Date();
+                updateUITheme();
                 refreshUI();
             }
         }
@@ -153,25 +154,25 @@
             location.reload();
         }
 
-        // --- THEME DYNAMICS ---
+        // --- TEMA WARNA INPUT ---
         function updateUITheme() {
             const gw = document.getElementById('f-gw').value;
             const nomInput = document.getElementById('f-nom');
-            const allInputs = [document.getElementById('f-date'), document.getElementById('f-gw'), nomInput, document.getElementById('f-note')];
+            const inputs = [document.getElementById('f-date'), document.getElementById('f-gw'), nomInput, document.getElementById('f-note')];
             
-            allInputs.forEach(el => {
+            inputs.forEach(el => {
                 el.classList.remove('focus-blue', 'focus-amber', 'focus-indigo');
                 if(gw === 'Tripay Kliring') el.classList.add('focus-amber');
                 else if(gw === 'Tripay Tersedia') el.classList.add('focus-indigo');
                 else el.classList.add('focus-blue');
             });
 
-            if(gw === 'Tripay Kliring') nomInput.style.color = "#d97706";
-            else if(gw === 'Tripay Tersedia') nomInput.style.color = "#4f46e5";
-            else nomInput.style.color = "#2563eb";
+            if(gw === 'Tripay Kliring') nomInput.style.color = "#d97706"; // Orange
+            else if(gw === 'Tripay Tersedia') nomInput.style.color = "#4f46e5"; // Indigo
+            else nomInput.style.color = "#2563eb"; // Blue
         }
 
-        // --- LOGIC ---
+        // --- CORE LOGIC ---
         function formatRupiah(el) {
             let v = el.value.replace(/\D/g, "");
             el.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -182,7 +183,6 @@
             const up = document.getElementById('mode-up');
             const wd = document.getElementById('mode-wd');
             const btn = document.getElementById('btn-save');
-            
             if(m === 'UPDATE') {
                 up.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm";
                 wd.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
@@ -196,23 +196,18 @@
 
         function saveData() {
             const nom = parseInt(document.getElementById('f-nom').value.replace(/\./g, "")) || 0;
-            const dateInput = document.getElementById('f-date').value;
+            const dateVal = document.getElementById('f-date').value;
             const gw = document.getElementById('f-gw').value;
             const note = document.getElementById('f-note').value || '-';
 
-            if(!nom || !dateInput) return alert("Nominal dan Tanggal wajib diisi!");
-
-            const dObj = new Date(dateInput);
-            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            if(!nom || !dateVal) return alert("Nominal & Tanggal wajib diisi!");
 
             const payload = {
                 id: Date.now(),
                 mode: currentMode,
                 gw, nom, note,
-                date: dateInput.split('-').reverse().join('/'),
-                rawDate: dateInput,
-                monthName: months[dObj.getMonth()],
-                year: dObj.getFullYear(),
+                date: dateVal.split('-').reverse().join('/'),
+                rawDate: dateVal,
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
             };
 
@@ -228,76 +223,56 @@
         function refreshUI() {
             const body = document.getElementById('table-body');
             body.innerHTML = '';
-            let balances = { "Gopay": 0, "Tripay Tersedia": 0, "Tripay Kliring": 0, "Qiospay": 0 };
+            let bal = { "Gopay": 0, "Tripay Tersedia": 0, "Tripay Kliring": 0, "Qiospay": 0 };
 
-            Object.keys(balances).forEach(key => {
+            Object.keys(bal).forEach(key => {
                 const filtered = db.filter(i => i.gw === key).reverse();
                 let current = 0;
                 filtered.forEach(item => {
                     if(item.mode === 'UPDATE') current = item.nom;
                     else current -= item.nom;
                 });
-                balances[key] = current;
+                bal[key] = current;
             });
 
-            document.getElementById('bal-gopay').innerText = "Rp " + balances["Gopay"].toLocaleString('id-ID');
-            document.getElementById('bal-tr').innerText = "Rp " + balances["Tripay Tersedia"].toLocaleString('id-ID');
-            document.getElementById('bal-tk').innerText = "Rp " + balances["Tripay Kliring"].toLocaleString('id-ID');
-            const total = Object.values(balances).reduce((a, b) => a + b, 0);
+            document.getElementById('bal-gopay').innerText = "Rp " + bal["Gopay"].toLocaleString('id-ID');
+            document.getElementById('bal-tr').innerText = "Rp " + bal["Tripay Tersedia"].toLocaleString('id-ID');
+            document.getElementById('bal-tk').innerText = "Rp " + bal["Tripay Kliring"].toLocaleString('id-ID');
+            const total = Object.values(bal).reduce((a, b) => a + b, 0);
             document.getElementById('bal-total').innerText = "Rp " + total.toLocaleString('id-ID');
 
             db.forEach(item => {
                 const isWD = item.mode === 'WD';
-                let gwStyle = "text-blue-600";
-                if(item.gw === "Tripay Kliring") gwStyle = "text-amber-600";
-                if(item.gw === "Tripay Tersedia") gwStyle = "text-indigo-600";
-
+                let color = (item.gw === "Tripay Kliring") ? "text-amber-600" : (item.gw === "Tripay Tersedia") ? "text-indigo-600" : "text-blue-600";
                 body.innerHTML += `
                 <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="p-5 font-bold text-xs">
-                        ${item.date}<br>
-                        <span class="text-[9px] text-slate-400 font-medium">${item.time} WIB</span>
-                    </td>
-                    <td class="p-5 text-center">
-                        <span class="px-2 py-1 rounded-md text-[8px] font-black tracking-tighter ${isWD ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-blue-50 text-blue-500 border border-blue-100'}">
-                            ${item.mode}
-                        </span>
-                    </td>
-                    <td class="p-5">
-                        <p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">
-                            ${isWD ? '-' : ''}Rp ${item.nom.toLocaleString('id-ID')}
-                        </p>
-                        <p class="text-[9px] text-slate-400 uppercase font-medium truncate max-w-[150px]">${item.note}</p>
-                    </td>
-                    <td class="p-5 text-right font-black text-[9px] ${gwStyle} uppercase italic">
-                        ${item.gw}
-                        <button onclick="removeItem(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500">✕</button>
-                    </td>
+                    <td class="p-5 font-bold text-xs">${item.date}<br><span class="text-[9px] text-slate-400 font-medium">${item.time} WIB</span></td>
+                    <td class="p-5 text-center"><span class="px-2 py-1 rounded-md text-[8px] font-black tracking-tighter ${isWD ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-blue-50 text-blue-500 border border-blue-100'}">${item.mode}</span></td>
+                    <td class="p-5"><p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">${isWD ? '-' : ''}Rp ${item.nom.toLocaleString('id-ID')}</p><p class="text-[9px] text-slate-400 uppercase font-medium truncate max-w-[150px]">${item.note}</p></td>
+                    <td class="p-5 text-right font-black text-[9px] ${color} uppercase italic">${item.gw}<button onclick="removeItem(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500">✕</button></td>
                 </tr>`;
             });
         }
 
         function removeItem(id) {
-            if(confirm("Hapus baris ini?")) {
-                db = db.filter(i => i.id !== id);
-                localStorage.setItem('swg_v8', JSON.stringify(db));
-                refreshUI();
-            }
+            if(confirm("Hapus data ini?")) { db = db.filter(i => i.id !== id); localStorage.setItem('swg_v8', JSON.stringify(db)); refreshUI(); }
         }
 
         function clearAll() {
-            if(confirm("Hapus semua data?")) {
-                db = []; localStorage.removeItem('swg_v8'); refreshUI();
-            }
+            if(confirm("Hapus SEMUA data?")) { db = []; localStorage.removeItem('swg_v8'); refreshUI(); }
         }
 
-        // --- EXCEL SMART NAMING ---
+        // --- PERBAIKAN LOGIKA DOWNLOAD EXCEL (NAMA FILE SESUAI TANGGAL INPUT) ---
         function downloadExcel() {
-            if(db.length === 0) return alert("Tidak ada data!");
+            if(db.length === 0) return alert("Tidak ada data untuk diekspor!");
             
-            // Mengambil bulan/tahun dari data paling atas di tabel
-            const ref = db[0];
-            const namaFile = `Laporan_SawargiPay_${ref.monthName}_${ref.year}.xlsx`;
+            // Ambil tanggal dari input f-date yang sedang aktif
+            const inputDate = document.getElementById('f-date').value;
+            const d = new Date(inputDate);
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            // Format Nama File: Laporan_SawargiPay_Bulan_Tahun.xlsx
+            const fileName = `Laporan_SawargiPay_${months[d.getMonth()]}_${d.getFullYear()}.xlsx`;
 
             const dataExcel = db.map((i, idx) => ({
                 "NO": db.length - idx,
@@ -310,11 +285,9 @@
             }));
 
             const ws = XLSX.utils.json_to_sheet(dataExcel);
-            ws['!cols'] = [{wch: 5}, {wch: 15}, {wch: 10}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 35}];
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Ledger");
-            
-            XLSX.writeFile(wb, namaFile);
+            XLSX.utils.book_append_sheet(wb, ws, "SawargiPay_Ledger");
+            XLSX.writeFile(wb, fileName);
         }
 
         setInterval(() => {
