@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay | Sawargipay v6</title>
+    <title>SawargiPay | Secure Ledger v6.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -15,34 +15,59 @@
         .input-pro:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
         .btn-update { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); }
         .btn-wd { background: linear-gradient(135deg, #da3633 0%, #f85149 100%); }
-        /* Hilangkan spinner number */
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .status-pill { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        #login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="p-4 md:p-10 min-h-screen">
 
-    <div class="max-w-7xl mx-auto">
+    <div id="login-overlay">
+        <div class="glass p-8 w-full max-w-md text-center border-t-4 border-blue-500">
+            <h1 class="text-2xl font-black tracking-tighter italic uppercase text-blue-500 mb-2">Sawar<span class="text-white not-italic">gipay</span></h1>
+            <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 text-center">Financial Control Center</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[9px] font-black text-slate-500 uppercase block mb-2 text-left ml-1">Username</label>
+                    <input type="text" id="user-input" placeholder="Username" class="w-full p-4 input-pro">
+                </div>
+                <div>
+                    <label class="text-[9px] font-black text-slate-500 uppercase block mb-2 text-left ml-1">Password</label>
+                    <input type="password" id="pass-input" placeholder="••••" class="w-full p-4 input-pro">
+                </div>
+                <button onclick="checkAuth()" class="w-full bg-blue-600 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-blue-500 transition-all mt-4 text-white shadow-lg shadow-blue-900/20">Login System</button>
+            </div>
+            <p id="login-err" class="text-red-500 text-[10px] mt-6 font-bold hidden uppercase tracking-widest italic">Akses Ditolak: Data Tidak Valid</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="max-w-7xl mx-auto hidden">
         <div class="flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-xl font-black tracking-tighter italic uppercase text-blue-500">Sawar<span class="text-white not-italic">gipay</span></h1>
-                <p id="clock" class="text-[9px] font-bold text-slate-500 tracking-[0.3em] mt-1"></p>
+                <p id="clock" class="text-[9px] font-bold text-slate-500 tracking-[0.3em] mt-1 uppercase"></p>
             </div>
-            <button onclick="exportToExcel()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Excel Export</button>
+            <div class="flex gap-2">
+                <button onclick="exportToExcel()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Excel Export</button>
+                <button onclick="logout()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-red-500 border-red-500/20">Logout</button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
             <div class="glass p-6 border-l-4 border-blue-500">
                 <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Auto Gopay</p>
-                <h2 id="disp-gopay" class="text-xl font-extrabold italic">Rp 0</h2>
+                <h2 id="disp-gopay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
             </div>
             <div class="glass p-6 border-l-4 border-indigo-500">
                 <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Tripay Engine</p>
-                <h2 id="disp-tripay" class="text-xl font-extrabold italic">Rp 0</h2>
+                <h2 id="disp-tripay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
             </div>
             <div class="glass p-6 border-l-4 border-rose-500">
                 <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Qiospay Gateway</p>
-                <h2 id="disp-qiospay" class="text-xl font-extrabold italic">Rp 0</h2>
+                <h2 id="disp-qiospay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
             </div>
             <div class="glass p-6 bg-gradient-to-br from-blue-600 to-indigo-700 border-none">
                 <p class="text-blue-100 text-[9px] font-black uppercase tracking-widest mb-2">Net Liquidity</p>
@@ -54,14 +79,18 @@
             <div class="lg:col-span-1">
                 <div class="glass p-8 sticky top-8 border-t-2 border-blue-500/50">
                     <div class="flex bg-black/40 p-1 rounded-xl mb-6">
-                        <button id="m-up" onclick="setMode('UPDATE')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600">Update Saldo</button>
+                        <button id="m-up" onclick="setMode('UPDATE')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600 text-white">Update Saldo</button>
                         <button id="m-wd" onclick="setMode('WD')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500">Penarikan (WD)</button>
                     </div>
 
                     <div class="space-y-5">
                         <div>
+                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Tanggal Mutasi</label>
+                            <input type="date" id="in-date" class="w-full p-4 input-pro text-sm uppercase">
+                        </div>
+                        <div>
                             <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Gateway</label>
-                            <select id="in-gw" class="w-full p-4 input-pro text-sm">
+                            <select id="in-gw" class="w-full p-4 input-pro text-sm font-bold">
                                 <option value="Gopay">Auto Gopay</option>
                                 <option value="Tripay">Tripay Engine</option>
                                 <option value="Qiospay">Qiospay Gateway</option>
@@ -69,25 +98,25 @@
                         </div>
                         <div>
                             <label id="lbl-nom" class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Nominal Saldo</label>
-                            <input type="text" id="in-nom" oninput="formatInput(this)" placeholder="0" class="w-full p-4 text-xl input-pro">
+                            <input type="text" id="in-nom" oninput="formatInput(this)" placeholder="0" class="w-full p-4 text-xl input-pro tracking-wide">
                         </div>
                         <div>
                             <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Catatan Mutasi</label>
                             <input type="text" id="in-note" placeholder="..." class="w-full p-4 text-sm input-pro font-normal">
                         </div>
-                        <button id="btn-sub" onclick="process()" class="w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4">Simpan Laporan</button>
+                        <button id="btn-sub" onclick="process()" class="w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white hover:scale-[1.02] active:scale-[0.98] transition-all">Simpan Laporan</button>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 glass overflow-hidden flex flex-col">
+            <div class="lg:col-span-2 glass overflow-hidden flex flex-col min-h-[600px]">
                 <div class="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Audit Trail Ledger</h3>
-                    <button onclick="clearDB()" class="text-[9px] font-bold text-red-500 opacity-40 hover:opacity-100 uppercase">Clear All</button>
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Audit Trail Ledger</h3>
+                    <button onclick="clearDB()" class="text-[9px] font-bold text-red-500 opacity-40 hover:opacity-100 uppercase transition-all">Clear All History</button>
                 </div>
-                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                <div class="overflow-x-auto overflow-y-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/60 sticky top-0">
+                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/60 sticky top-0 z-10">
                             <tr>
                                 <th class="p-6">Timestamp</th>
                                 <th class="p-6">Mutasi</th>
@@ -95,7 +124,7 @@
                                 <th class="p-6 text-right">Gateway</th>
                             </tr>
                         </thead>
-                        <tbody id="log-body" class="divide-y divide-white/5"></tbody>
+                        <tbody id="log-body" class="divide-y divide-white/5 text-white"></tbody>
                     </table>
                 </div>
             </div>
@@ -103,8 +132,38 @@
     </div>
 
     <script>
+        // CONFIGURASI LOGIN RIKSAN
+        const VALID_USER = "sawargi@";
+        const VALID_PASS = "456";
+        
         let db = JSON.parse(localStorage.getItem('swg_ledger_v6')) || [];
         let mode = 'UPDATE';
+
+        function checkAuth() {
+            const user = document.getElementById('user-input').value;
+            const pass = document.getElementById('pass-input').value;
+            
+            if(user === VALID_USER && pass === VALID_PASS) {
+                sessionStorage.setItem('swg_auth', 'active');
+                showDashboard();
+            } else {
+                const err = document.getElementById('login-err');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 3000);
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('in-date').valueAsDate = new Date();
+            render();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('swg_auth');
+            location.reload();
+        }
 
         function setMode(m) {
             mode = m;
@@ -139,17 +198,26 @@
             const val = toNum(nomStr);
             const gw = document.getElementById('in-gw').value;
             const note = document.getElementById('in-note').value || '-';
+            const customDate = document.getElementById('in-date').value;
 
             if(val <= 0) return alert("Nominal tidak valid!");
+            if(!customDate) return alert("Silahkan pilih tanggal mutasi.");
+
+            const dateParts = customDate.split('-');
+            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
 
             const entry = {
                 id: Date.now(),
                 mode, gw, val, note,
-                date: new Date().toLocaleDateString('id-ID'),
+                date: formattedDate,
+                rawDate: customDate,
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
             };
 
             db.unshift(entry);
+            // Sort history by date input
+            db.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate) || b.id - a.id);
+            
             localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
             render();
             
@@ -160,42 +228,28 @@
         function render() {
             const body = document.getElementById('log-body');
             body.innerHTML = '';
-            
             let balances = { Gopay: 0, Tripay: 0, Qiospay: 0 };
 
-            // LOGIC PINTAR: Saldo Akhir = Update Terakhir - Total WD sejak update tersebut
             ['Gopay', 'Tripay', 'Qiospay'].forEach(g => {
-                const logs = db.filter(i => i.gw === g);
+                const logs = db.filter(i => i.gw === g).reverse();
                 let currentBal = 0;
-                
-                // Cari update saldo terbaru
-                const lastUpdateIdx = logs.findIndex(i => i.mode === 'UPDATE');
-                
-                if (lastUpdateIdx !== -1) {
-                    currentBal = logs[lastUpdateIdx].val;
-                    // Kurangi dengan semua WD yang terjadi SETELAH update tersebut
-                    for (let i = 0; i < lastUpdateIdx; i++) {
-                        if (logs[i].mode === 'WD') currentBal -= logs[i].val;
-                    }
-                } else {
-                    // Jika belum ada update, hitung WD sebagai minus (opsional)
-                    logs.forEach(i => { if(i.mode === 'WD') currentBal -= i.val; });
-                }
-
+                logs.forEach(i => {
+                    if(i.mode === 'UPDATE') currentBal = i.val;
+                    else currentBal -= i.val;
+                });
                 balances[g] = currentBal;
                 document.getElementById(`disp-${g.toLowerCase()}`).innerText = toIDR(currentBal);
             });
 
-            const total = balances.Gopay + balances.Tripay + balances.Qiospay;
-            document.getElementById('disp-total').innerText = toIDR(total);
+            document.getElementById('disp-total').innerText = toIDR(balances.Gopay + balances.Tripay + balances.Qiospay);
 
             db.forEach(item => {
                 const isWD = item.mode === 'WD';
                 body.innerHTML += `
-                    <tr class="hover:bg-white/[0.02] transition-colors">
+                    <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.03]">
                         <td class="p-6">
-                            <p class="font-bold text-white text-xs">${item.date}</p>
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">${item.time} WIB</p>
+                            <p class="font-bold text-xs text-white">${item.date}</p>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter italic">${item.time} WIB</p>
                         </td>
                         <td class="p-6">
                             <span class="status-pill ${isWD ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}">
@@ -204,7 +258,7 @@
                         </td>
                         <td class="p-6 font-bold ${isWD ? 'text-red-400' : 'text-white'} text-sm italic">
                             ${isWD ? '-' : ''}${toIDR(item.val)}
-                            <p class="text-[9px] text-slate-600 not-italic font-medium mt-1 uppercase">${item.note}</p>
+                            <p class="text-[9px] text-slate-600 not-italic font-medium mt-1 uppercase tracking-widest">${item.note}</p>
                         </td>
                         <td class="p-6 text-right font-black uppercase text-blue-500 text-[10px] tracking-widest">
                             ${item.gw}
@@ -216,7 +270,7 @@
         }
 
         function del(id) {
-            if(confirm("Hapus log ini?")) {
+            if(confirm("Hapus data mutasi ini secara permanen?")) {
                 db = db.filter(i => i.id !== id);
                 localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
                 render();
@@ -224,21 +278,23 @@
         }
 
         function clearDB() {
-            if(confirm("Hapus total data?")) {
-                db = []; localStorage.clear(); render();
+            if(confirm("PERINGATAN: Semua data laporan keuangan akan dihapus. Lanjutkan?")) {
+                db = []; 
+                localStorage.removeItem('swg_ledger_v6'); 
+                render();
             }
         }
 
         function exportToExcel() {
-            if(db.length === 0) return alert("Data kosong!");
+            if(db.length === 0) return alert("Belum ada data untuk diekspor!");
             const exportData = db.map(i => ({
                 TANGGAL: i.date, WAKTU: i.time, GATEWAY: i.gw,
-                TIPE: i.mode === 'UPDATE' ? 'MASUK/UPDATE' : 'PENARIKAN',
+                JENIS: i.mode === 'UPDATE' ? 'UPDATE/SALDO AWAL' : 'PENARIKAN (WD)',
                 NOMINAL: i.val, CATATAN: i.note
             }));
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Financial_Report");
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan_SawargiPay");
             XLSX.writeFile(wb, `SawargiPay_Final_Report.xlsx`);
         }
 
@@ -247,7 +303,11 @@
             document.getElementById('clock').innerText = now.toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
         }, 1000);
 
-        window.onload = render;
+        window.onload = () => {
+            if(sessionStorage.getItem('swg_auth') === 'active') {
+                showDashboard();
+            }
+        };
     </script>
 </body>
 </html>
