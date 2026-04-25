@@ -3,148 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay | Secure Ledger v6.2</title>
+    <title>SawargiPay v7 | Arctic Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #05070a; --card: #0d1117; --accent: #3b82f6; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: #f0f6fc; touch-action: manipulation; }
-        .glass { background: var(--card); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
-        .input-pro { background: #161b22 !important; border: 1px solid #30363d !important; border-radius: 12px !important; color: white !important; font-weight: 700; transition: 0.2s; }
-        .input-pro:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        .btn-update { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); }
-        .btn-wd { background: linear-gradient(135deg, #da3633 0%, #f85149 100%); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .status-pill { font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        :root { 
+            --bg: #f8fafc; 
+            --card: rgba(255, 255, 255, 0.8); 
+            --accent: #2563eb; 
+            --text-main: #1e293b;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 100%); 
+            color: var(--text-main); 
+            min-h-screen;
+        }
+        .glass-card { 
+            background: var(--card); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,1); 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            border-radius: 30px; 
+        }
+        .input-premium { 
+            background: white !important; 
+            border: 2px solid #e2e8f0 !important; 
+            border-radius: 16px !important; 
+            transition: all 0.3s ease;
+        }
+        .input-premium:focus { 
+            border-color: var(--accent) !important; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .btn-grad-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .btn-grad-red { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
         
-        #login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .status-pill { font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 10px; }
+        #login-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
+        
+        /* Custom Table Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen">
+<body class="p-4 md:p-8">
 
     <div id="login-overlay">
-        <div class="glass p-8 w-full max-w-md text-center border-t-4 border-blue-500">
-            <h1 class="text-2xl font-black tracking-tighter italic uppercase text-blue-500 mb-2">Sawar<span class="text-white not-italic">gipay</span></h1>
-            <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-8 text-center">Financial Control Center</p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[9px] font-black text-slate-500 uppercase block mb-2 text-left ml-1">Username</label>
-                    <input type="text" id="user-input" placeholder="Username" class="w-full p-4 input-pro">
-                </div>
-                <div>
-                    <label class="text-[9px] font-black text-slate-500 uppercase block mb-2 text-left ml-1">Password</label>
-                    <input type="password" id="pass-input" placeholder="••••" class="w-full p-4 input-pro">
-                </div>
-                <button onclick="checkAuth()" class="w-full bg-blue-600 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-blue-500 transition-all mt-4 text-white shadow-lg shadow-blue-900/20">Login System</button>
+        <div class="glass-card p-10 w-full max-w-md border-b-8 border-blue-600">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold tracking-tighter text-blue-600 italic">SAWAR<span class="text-slate-800 not-italic">GIPAY</span></h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-2">Executive Ledger v7</p>
             </div>
-            <p id="login-err" class="text-red-500 text-[10px] mt-6 font-bold hidden uppercase tracking-widest italic">Akses Ditolak: Data Tidak Valid</p>
+            <div class="space-y-4">
+                <input type="text" id="user-input" placeholder="Username" class="w-full p-4 input-premium font-semibold">
+                <input type="password" id="pass-input" placeholder="Password" class="w-full p-4 input-premium font-semibold">
+                <button onclick="checkAuth()" class="w-full btn-grad-blue text-white py-4 rounded-2xl font-bold text-sm tracking-widest shadow-lg shadow-blue-200 hover:scale-[1.02] transition-all">SIGN IN</button>
+            </div>
+            <p id="login-err" class="text-red-500 text-[10px] mt-6 font-bold hidden text-center italic">DATA AKSES TIDAK VALID</p>
         </div>
     </div>
 
-    <div id="main-content" class="max-w-7xl mx-auto hidden">
-        <div class="flex justify-between items-center mb-10">
+    <div id="main-content" class="max-w-6xl mx-auto hidden">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
             <div>
-                <h1 class="text-xl font-black tracking-tighter italic uppercase text-blue-500">Sawar<span class="text-white not-italic">gipay</span></h1>
-                <p id="clock" class="text-[9px] font-bold text-slate-500 tracking-[0.3em] mt-1 uppercase"></p>
+                <h1 class="text-2xl font-black text-slate-800 italic tracking-tighter">SAWAR<span class="text-blue-600">GIPAY</span></h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <p id="clock" class="text-[10px] font-bold text-slate-400 tracking-widest uppercase"></p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="exportToExcel()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Excel Export</button>
-                <button onclick="logout()" class="glass px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-red-500 border-red-500/20">Logout</button>
+            <div class="flex gap-3">
+                <button onclick="exportToExcel()" class="bg-emerald-500 text-white px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-md shadow-emerald-100 hover:bg-emerald-600 transition-all">Download Excel</button>
+                <button onclick="logout()" class="glass-card px-6 py-3 rounded-2xl text-[11px] font-bold uppercase text-rose-500 hover:bg-rose-50 transition-all border-none shadow-none">Logout</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="glass-card p-6 bg-gradient-to-br from-white to-blue-50 border-none relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest mb-1">Gopay Balance</p>
+                    <h2 id="disp-gopay" class="text-2xl font-black text-slate-800">Rp 0</h2>
+                </div>
+                <div class="absolute -right-4 -bottom-4 text-blue-100 opacity-20 transform -rotate-12">
+                    <svg width="100" height="100" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </div>
+            </div>
+            <div class="glass-card p-6 bg-gradient-to-br from-white to-indigo-50 border-none">
+                <p class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest mb-1">Tripay Balance</p>
+                <h2 id="disp-tripay" class="text-2xl font-black text-slate-800">Rp 0</h2>
+            </div>
+            <div class="glass-card p-6 bg-blue-600 border-none shadow-xl shadow-blue-200">
+                <p class="text-blue-100 text-[10px] font-extrabold uppercase tracking-widest mb-1">Total Liquidity</p>
+                <h2 id="disp-total" class="text-2xl font-black text-white italic">Rp 0</h2>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-            <div class="glass p-6 border-l-4 border-blue-500">
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Auto Gopay</p>
-                <h2 id="disp-gopay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
-            </div>
-            <div class="glass p-6 border-l-4 border-indigo-500">
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Tripay Engine</p>
-                <h2 id="disp-tripay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
-            </div>
-            <div class="glass p-6 border-l-4 border-rose-500">
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-2">Qiospay Gateway</p>
-                <h2 id="disp-qiospay" class="text-xl font-extrabold italic text-white">Rp 0</h2>
-            </div>
-            <div class="glass p-6 bg-gradient-to-br from-blue-600 to-indigo-700 border-none">
-                <p class="text-blue-100 text-[9px] font-black uppercase tracking-widest mb-2">Net Liquidity</p>
-                <h2 id="disp-total" class="text-xl font-extrabold italic text-white">Rp 0</h2>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-1">
-                <div class="glass p-8 sticky top-8 border-t-2 border-blue-500/50">
-                    <div class="flex bg-black/40 p-1 rounded-xl mb-6">
-                        <button id="m-up" onclick="setMode('UPDATE')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600 text-white">Update Saldo</button>
-                        <button id="m-wd" onclick="setMode('WD')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500">Penarikan (WD)</button>
-                    </div>
-
+        <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4">
+                <div class="glass-card p-8 border-none bg-white">
+                    <h3 class="text-xs font-black uppercase tracking-[0.2em] mb-6 text-slate-400 border-b pb-4">Input Mutasi</h3>
                     <div class="space-y-5">
-                        <div>
-                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Tanggal Mutasi</label>
-                            <input type="date" id="in-date" class="w-full p-4 input-pro text-sm uppercase">
+                        <div class="flex bg-slate-100 p-1.5 rounded-2xl mb-4">
+                            <button id="m-up" onclick="setMode('UPDATE')" class="flex-1 py-3 rounded-xl text-[10px] font-bold uppercase bg-white text-blue-600 shadow-sm transition-all">Update</button>
+                            <button id="m-wd" onclick="setMode('WD')" class="flex-1 py-3 rounded-xl text-[10px] font-bold uppercase text-slate-400 transition-all">Withdraw</button>
                         </div>
                         <div>
-                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Gateway</label>
-                            <select id="in-gw" class="w-full p-4 input-pro text-sm font-bold">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1 block mb-2">Tanggal</label>
+                            <input type="date" id="in-date" class="w-full p-4 input-premium text-sm font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1 block mb-2">Gateway</label>
+                            <select id="in-gw" class="w-full p-4 input-premium text-sm font-bold text-slate-700">
                                 <option value="Gopay">Auto Gopay</option>
                                 <option value="Tripay">Tripay Engine</option>
                                 <option value="Qiospay">Qiospay Gateway</option>
                             </select>
                         </div>
                         <div>
-                            <label id="lbl-nom" class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Nominal Saldo</label>
-                            <input type="text" id="in-nom" oninput="formatInput(this)" placeholder="0" class="w-full p-4 text-xl input-pro tracking-wide">
+                            <label id="lbl-nom" class="text-[10px] font-bold text-slate-500 uppercase ml-1 block mb-2">Nominal</label>
+                            <input type="text" id="in-nom" oninput="formatInput(this)" placeholder="0" class="w-full p-4 text-xl input-premium font-black text-blue-600 tracking-wide">
                         </div>
                         <div>
-                            <label class="text-[9px] font-black text-slate-500 uppercase ml-1 block mb-2">Catatan Mutasi</label>
-                            <input type="text" id="in-note" placeholder="..." class="w-full p-4 text-sm input-pro font-normal">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1 block mb-2">Catatan</label>
+                            <input type="text" id="in-note" placeholder="Keterangan..." class="w-full p-4 text-sm input-premium font-medium">
                         </div>
-                        <button id="btn-sub" onclick="process()" class="w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white hover:scale-[1.02] active:scale-[0.98] transition-all">Simpan Laporan</button>
+                        <button id="btn-sub" onclick="process()" class="w-full btn-grad-blue py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] text-white shadow-lg shadow-blue-100 hover:scale-[1.01] transition-all mt-4">Simpan Laporan</button>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 glass overflow-hidden flex flex-col min-h-[600px]">
-                <div class="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Audit Trail Ledger</h3>
-                    <button onclick="clearDB()" class="text-[9px] font-bold text-red-500 opacity-40 hover:opacity-100 uppercase transition-all">Clear All History</button>
-                </div>
-                <div class="overflow-x-auto overflow-y-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/60 sticky top-0 z-10">
-                            <tr>
-                                <th class="p-6">Timestamp</th>
-                                <th class="p-6">Mutasi</th>
-                                <th class="p-6">Nominal</th>
-                                <th class="p-6 text-right">Gateway</th>
-                            </tr>
-                        </thead>
-                        <tbody id="log-body" class="divide-y divide-white/5 text-white"></tbody>
-                    </table>
+            <div class="lg:col-span-8 flex flex-col">
+                <div class="glass-card overflow-hidden flex flex-col bg-white border-none h-full">
+                    <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Ledger History</h3>
+                        <button onclick="clearDB()" class="text-[10px] font-bold text-rose-400 hover:text-rose-600 uppercase">Clear All</button>
+                    </div>
+                    <div class="overflow-x-auto overflow-y-auto max-h-[650px] custom-scroll">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-white sticky top-0 z-10 border-b">
+                                <tr class="text-[10px] text-slate-400 uppercase font-black">
+                                    <th class="p-6">Waktu & Tanggal</th>
+                                    <th class="p-6">Tipe</th>
+                                    <th class="p-6">Nominal</th>
+                                    <th class="p-6 text-right">Gateway</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURASI LOGIN RIKSAN
         const VALID_USER = "sawargi@";
         const VALID_PASS = "456";
         
-        let db = JSON.parse(localStorage.getItem('swg_ledger_v6')) || [];
+        let db = JSON.parse(localStorage.getItem('swg_ledger_v7')) || [];
         let mode = 'UPDATE';
 
         function checkAuth() {
             const user = document.getElementById('user-input').value;
             const pass = document.getElementById('pass-input').value;
-            
             if(user === VALID_USER && pass === VALID_PASS) {
-                sessionStorage.setItem('swg_auth', 'active');
+                sessionStorage.setItem('swg_auth_v7', 'active');
                 showDashboard();
             } else {
                 const err = document.getElementById('login-err');
@@ -161,7 +188,7 @@
         }
 
         function logout() {
-            sessionStorage.removeItem('swg_auth');
+            sessionStorage.removeItem('swg_auth_v7');
             location.reload();
         }
 
@@ -170,18 +197,14 @@
             const up = document.getElementById('m-up');
             const wd = document.getElementById('m-wd');
             const sub = document.getElementById('btn-sub');
-            const lbl = document.getElementById('lbl-nom');
-
             if(m === 'UPDATE') {
-                up.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-blue-600 text-white";
-                wd.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500";
-                sub.className = "w-full btn-update py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white";
-                lbl.innerText = "Nominal Saldo Terkini";
+                up.className = "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase bg-white text-blue-600 shadow-sm";
+                wd.className = "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase text-slate-400";
+                sub.className = "w-full btn-grad-blue py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] text-white shadow-lg transition-all mt-4";
             } else {
-                wd.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-red-600 text-white";
-                up.className = "flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-500";
-                sub.className = "w-full btn-wd py-5 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl mt-4 text-white";
-                lbl.innerText = "Nominal Penarikan (WD)";
+                wd.className = "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase bg-white text-rose-600 shadow-sm";
+                up.className = "flex-1 py-3 rounded-xl text-[10px] font-bold uppercase text-slate-400";
+                sub.className = "w-full btn-grad-red py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] text-white shadow-lg transition-all mt-4";
             }
         }
 
@@ -194,35 +217,28 @@
         function toIDR(num) { return "Rp " + num.toLocaleString('id-ID'); }
 
         function process() {
-            const nomStr = document.getElementById('in-nom').value;
-            const val = toNum(nomStr);
+            const val = toNum(document.getElementById('in-nom').value);
             const gw = document.getElementById('in-gw').value;
             const note = document.getElementById('in-note').value || '-';
             const customDate = document.getElementById('in-date').value;
 
-            if(val <= 0) return alert("Nominal tidak valid!");
-            if(!customDate) return alert("Silahkan pilih tanggal mutasi.");
-
-            const dateParts = customDate.split('-');
-            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            if(val <= 0 || !customDate) return alert("Mohon lengkapi data!");
 
             const entry = {
                 id: Date.now(),
                 mode, gw, val, note,
-                date: formattedDate,
+                date: customDate.split('-').reverse().join('/'),
                 rawDate: customDate,
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
             };
 
             db.unshift(entry);
-            // Sort history by date input
             db.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate) || b.id - a.id);
-            
-            localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
-            render();
+            localStorage.setItem('swg_ledger_v7', JSON.stringify(db));
             
             document.getElementById('in-nom').value = '';
             document.getElementById('in-note').value = '';
+            render();
         }
 
         function render() {
@@ -232,13 +248,11 @@
 
             ['Gopay', 'Tripay', 'Qiospay'].forEach(g => {
                 const logs = db.filter(i => i.gw === g).reverse();
-                let currentBal = 0;
-                logs.forEach(i => {
-                    if(i.mode === 'UPDATE') currentBal = i.val;
-                    else currentBal -= i.val;
-                });
-                balances[g] = currentBal;
-                document.getElementById(`disp-${g.toLowerCase()}`).innerText = toIDR(currentBal);
+                let b = 0;
+                logs.forEach(i => b = (i.mode === 'UPDATE' ? i.val : b - i.val));
+                balances[g] = b;
+                const el = document.getElementById(`disp-${g.toLowerCase()}`);
+                if(el) el.innerText = toIDR(b);
             });
 
             document.getElementById('disp-total').innerText = toIDR(balances.Gopay + balances.Tripay + balances.Qiospay);
@@ -246,23 +260,23 @@
             db.forEach(item => {
                 const isWD = item.mode === 'WD';
                 body.innerHTML += `
-                    <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.03]">
+                    <tr class="hover:bg-slate-50/80 transition-all border-b border-slate-50">
                         <td class="p-6">
-                            <p class="font-bold text-xs text-white">${item.date}</p>
-                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-tighter italic">${item.time} WIB</p>
+                            <p class="font-bold text-xs text-slate-800">${item.date}</p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">${item.time} WIB</p>
                         </td>
                         <td class="p-6">
-                            <span class="status-pill ${isWD ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}">
-                                ${isWD ? 'Withdraw' : 'Update'}
+                            <span class="status-pill ${isWD ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}">
+                                ${isWD ? 'WITHDRAW' : 'UPDATE'}
                             </span>
                         </td>
-                        <td class="p-6 font-bold ${isWD ? 'text-red-400' : 'text-white'} text-sm italic">
-                            ${isWD ? '-' : ''}${toIDR(item.val)}
-                            <p class="text-[9px] text-slate-600 not-italic font-medium mt-1 uppercase tracking-widest">${item.note}</p>
+                        <td class="p-6">
+                            <p class="font-black ${isWD ? 'text-rose-500' : 'text-slate-800'} text-sm italic">${isWD ? '-' : ''}${toIDR(item.val)}</p>
+                            <p class="text-[9px] text-slate-400 font-medium uppercase mt-1">${item.note}</p>
                         </td>
-                        <td class="p-6 text-right font-black uppercase text-blue-500 text-[10px] tracking-widest">
-                            ${item.gw}
-                            <button onclick="del(${item.id})" class="ml-4 text-slate-800 hover:text-red-500 transition-colors">✕</button>
+                        <td class="p-6 text-right">
+                            <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg tracking-widest">${item.gw.toUpperCase()}</span>
+                            <button onclick="del(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500 transition-all">✕</button>
                         </td>
                     </tr>
                 `;
@@ -270,32 +284,43 @@
         }
 
         function del(id) {
-            if(confirm("Hapus data mutasi ini secara permanen?")) {
+            if(confirm("Hapus baris ini?")) {
                 db = db.filter(i => i.id !== id);
-                localStorage.setItem('swg_ledger_v6', JSON.stringify(db));
+                localStorage.setItem('swg_ledger_v7', JSON.stringify(db));
                 render();
             }
         }
 
         function clearDB() {
-            if(confirm("PERINGATAN: Semua data laporan keuangan akan dihapus. Lanjutkan?")) {
-                db = []; 
-                localStorage.removeItem('swg_ledger_v6'); 
-                render();
+            if(confirm("Hapus semua data?")) {
+                db = []; localStorage.removeItem('swg_ledger_v7'); render();
             }
         }
 
         function exportToExcel() {
-            if(db.length === 0) return alert("Belum ada data untuk diekspor!");
-            const exportData = db.map(i => ({
-                TANGGAL: i.date, WAKTU: i.time, GATEWAY: i.gw,
-                JENIS: i.mode === 'UPDATE' ? 'UPDATE/SALDO AWAL' : 'PENARIKAN (WD)',
-                NOMINAL: i.val, CATATAN: i.note
+            if(db.length === 0) return alert("Data kosong!");
+            
+            const exportData = db.map((i, index) => ({
+                "NO": db.length - index,
+                "TANGGAL": i.date,
+                "WAKTU": i.time,
+                "GATEWAY": i.gw,
+                "JENIS TRANSAKSI": i.mode === 'UPDATE' ? 'MASUK / UPDATE SALDO' : 'PENARIKAN (WD)',
+                "NOMINAL (Rp)": i.val,
+                "KETERANGAN": i.note
             }));
+
             const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Atur lebar kolom Excel agar rapi
+            const wscols = [
+                {wch: 5}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 25}, {wch: 20}, {wch: 30}
+            ];
+            ws['!cols'] = wscols;
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Laporan_SawargiPay");
-            XLSX.writeFile(wb, `SawargiPay_Final_Report.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan Keuangan");
+            XLSX.writeFile(wb, `SawargiPay_Report_${new Date().toLocaleDateString()}.xlsx`);
         }
 
         setInterval(() => {
@@ -304,9 +329,7 @@
         }, 1000);
 
         window.onload = () => {
-            if(sessionStorage.getItem('swg_auth') === 'active') {
-                showDashboard();
-            }
+            if(sessionStorage.getItem('swg_auth_v7') === 'active') showDashboard();
         };
     </script>
 </body>
