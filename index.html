@@ -3,123 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v12 | Structural Masterpiece</title>
+    <title>SawargiPay v8 | Ultra-Light Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; margin: 0; }
-        .card { background: #ffffff; border-radius: 20px; border: 1px solid #eef2f6; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .input-box { background: #fcfdfe !important; border: 2px solid #f1f5f9 !important; border-radius: 12px !important; outline: none !important; transition: 0.2s; width: 100%; }
-        .input-box:focus { border-color: #2563eb !important; background: #ffffff !important; }
-        #login-page { position: fixed; inset: 0; z-index: 9999; background: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfe; color: #1e293b; overflow-x: hidden; }
+        .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 12px !important; outline: none !important; transition: all 0.2s; }
+        
+        /* Dynamic Focus Colors */
+        .focus-blue:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .focus-amber:focus { border-color: #f59e0b !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+        .focus-indigo:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transition: all 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        #login-screen { position: fixed; inset: 0; background: #fdfdfe; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .hidden { display: none !important; }
-        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { min-width: 700px; width: 100%; border-collapse: collapse; }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        .sticky-header { position: sticky; top: 0; background: white; z-index: 10; }
+        th { border-bottom: 2px solid #f1f5f9; }
+        td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-6 lg:p-10">
 
-    <div id="login-page">
-        <div class="card p-8 md:p-12 w-full max-w-sm text-center shadow-2xl">
-            <div class="mb-8">
+    <div id="login-screen">
+        <div class="glass-card p-8 w-full max-w-sm text-center">
+            <div class="mb-6">
                 <h1 class="text-3xl font-black italic tracking-tighter text-blue-600 uppercase">SAWAR<span class="text-slate-800">GIPAY</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Executive System v12.0</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">Management System v8.0</p>
             </div>
             <div class="space-y-4">
-                <input type="text" id="u_name" placeholder="Username" class="p-4 input-box font-bold text-center uppercase tracking-widest text-sm">
-                <input type="password" id="u_pass" placeholder="Password" class="p-4 input-box font-bold text-center tracking-widest text-sm">
-                <button onclick="doAuth()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black tracking-widest uppercase hover:bg-blue-600 transition-all">Sign In</button>
+                <input type="text" id="user" placeholder="Username" class="w-full p-4 input-style font-semibold text-center focus-blue">
+                <input type="password" id="pass" placeholder="Password" class="w-full p-4 input-style font-semibold text-center focus-blue">
+                <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold tracking-widest uppercase text-sm shadow-lg shadow-blue-100">Login Access</button>
             </div>
-            <p id="err-msg" class="text-rose-500 text-[10px] mt-6 font-bold hidden italic uppercase">Akses Ditolak: Cek Username/Password</p>
+            <p id="err" class="text-rose-500 text-[10px] mt-4 font-bold uppercase hidden italic">Akses Ditolak: Cek Username/Password</p>
         </div>
     </div>
 
-    <div id="dashboard" class="max-w-7xl mx-auto hidden">
+    <div id="dashboard" class="max-w-6xl mx-auto hidden">
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div class="text-center md:text-left">
                 <h1 class="text-2xl font-black italic text-slate-800 tracking-tighter uppercase">SAWAR<span class="text-blue-600">GIPAY</span></h1>
-                <p id="real-time" class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase mt-1"></p>
+                <p id="clock" class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase"></p>
             </div>
-            <div class="flex gap-2 w-full md:w-auto">
-                <button onclick="downloadExcel()" class="flex-1 md:flex-none bg-emerald-500 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-50 hover:bg-emerald-600 transition-all">Download XLS</button>
-                <button onclick="logout()" class="bg-white text-slate-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase border border-slate-200 hover:text-rose-500 transition-all">Logout</button>
+            <div class="flex gap-2">
+                <button onclick="downloadExcel()" class="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-md shadow-emerald-50">Download Excel</button>
+                <button onclick="handleLogout()" class="bg-slate-100 text-slate-500 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-500 transition-all">Logout</button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="card p-6 border-l-4 border-blue-500">
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gopay Balance</p>
-                <h2 id="v-gopay" class="text-2xl font-black text-slate-800 mt-1">Rp 0</h2>
+            <div class="glass-card p-5 border-l-4 border-blue-500">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Gopay</span>
+                <h3 id="bal-gopay" class="text-xl font-black text-slate-800 mt-1">Rp 0</h3>
             </div>
-            <div class="card p-6 border-l-4 border-emerald-500">
-                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Tripay Ready</p>
-                <h2 id="v-tr" class="text-2xl font-black text-slate-800 mt-1">Rp 0</h2>
+            <div class="glass-card p-5 border-l-4 border-indigo-500 bg-indigo-50/10">
+                <span class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">Tripay Tersedia</span>
+                <h3 id="bal-tr" class="text-xl font-black text-indigo-900 mt-1">Rp 0</h3>
             </div>
-            <div class="card p-6 border-l-4 border-amber-500 bg-amber-50/20">
-                <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest">Tripay Kliring</p>
-                <h2 id="v-tk" class="text-2xl font-black text-amber-700 mt-1">Rp 0</h2>
+            <div class="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/20">
+                <span class="text-[9px] font-bold text-amber-600 uppercase tracking-widest">Tripay Kliring</span>
+                <h3 id="bal-tk" class="text-xl font-black text-amber-700 mt-1">Rp 0</h3>
             </div>
-            <div class="card p-6 bg-slate-900 border-none shadow-xl shadow-slate-200">
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Net Liquidity</p>
-                <h2 id="v-total" class="text-2xl font-black text-white italic mt-1">Rp 0</h2>
+            <div class="glass-card p-5 bg-slate-900 border-none">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Net Asset</span>
+                <h3 id="bal-total" class="text-xl font-black text-white italic mt-1">Rp 0</h3>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-12 gap-8 items-start">
-            <div class="lg:col-span-4 w-full">
-                <div class="card p-6 md:p-8 space-y-5">
-                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest border-b pb-4">Transaction Entry</h3>
+        <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4">
+                <div class="glass-card p-6 space-y-4 sticky top-6" id="entry-card">
+                    <h2 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Entry Data</h2>
                     <div class="flex bg-slate-100 p-1 rounded-xl">
-                        <button id="btn-up" onclick="setMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm">IN (UPDATE)</button>
-                        <button id="btn-wd" onclick="setMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400">OUT (WD)</button>
+                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm transition-all">Update</button>
+                        <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400 transition-all">Withdraw</button>
                     </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal</label>
-                            <input type="date" id="in-date" class="p-3.5 input-box font-bold text-sm">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Gateway</label>
-                            <select id="in-gw" class="p-3.5 input-box font-bold text-sm appearance-none cursor-pointer">
-                                <option value="GOPAY">Gopay Auto</option>
-                                <option value="TRIPAY TERSEDIA">Tripay Tersedia</option>
-                                <option value="TRIPAY KLIRING">Tripay Kliring</option>
-                                <option value="QIOSPAY">Qiospay Gateway</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Nominal (IDR)</label>
-                            <input type="text" id="in-nom" oninput="fmtCur(this)" placeholder="0" class="p-4 text-2xl input-box font-black text-blue-600">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Keterangan</label>
-                            <input type="text" id="in-note" placeholder="Contoh: Saldo harian..." class="p-3.5 input-box text-sm font-medium">
-                        </div>
-                        <button onclick="saveRecord()" id="submit-btn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-xs tracking-[0.3em] uppercase shadow-lg shadow-blue-100 transition-all hover:bg-blue-700 active:scale-95 mt-2">Submit Record</button>
-                    </div>
+                    <input type="date" id="f-date" class="w-full p-3.5 input-style font-bold text-sm focus-blue">
+                    
+                    <select id="f-gw" onchange="updateInputTheme()" class="w-full p-3.5 input-style font-bold text-sm appearance-none focus-blue">
+                        <option value="Gopay">Auto Gopay</option>
+                        <option value="Tripay Tersedia">Tripay Engine (Tersedia)</option>
+                        <option value="Tripay Kliring">Tripay Engine (Kliring)</option>
+                        <option value="Qiospay">Qiospay Gateway</option>
+                    </select>
+
+                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-4 text-xl input-style font-black text-blue-600 focus-blue">
+                    <input type="text" id="f-note" placeholder="Catatan/Keterangan..." class="w-full p-3.5 input-style text-sm focus-blue">
+                    
+                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg">Simpan Laporan</button>
                 </div>
             </div>
 
-            <div class="lg:col-span-8 w-full">
-                <div class="card overflow-hidden">
+            <div class="lg:col-span-8">
+                <div class="glass-card overflow-hidden min-h-[500px]">
                     <div class="p-5 border-b flex justify-between items-center bg-slate-50/30">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mutation History Ledger</span>
-                        <button onclick="resetData()" class="text-[9px] font-bold text-rose-300 hover:text-rose-500 uppercase tracking-tighter transition-colors">Clear All History</button>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">History Ledger</span>
+                        <button onclick="clearAll()" class="text-[10px] font-bold text-rose-300 hover:text-rose-500 uppercase transition-all">Clear All</button>
                     </div>
-                    <div class="table-container">
-                        <table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left table-fixed">
                             <thead class="bg-white">
                                 <tr class="text-[9px] text-slate-400 uppercase font-black">
-                                    <th class="w-32 sticky-header">Date & Time</th>
-                                    <th class="w-24 text-center sticky-header">Type</th>
-                                    <th class="sticky-header">Nominal & Note</th>
-                                    <th class="w-32 text-right sticky-header">Gateway</th>
+                                    <th class="p-5 w-32">Waktu</th>
+                                    <th class="p-5 w-20">Aksi</th>
+                                    <th class="p-5">Nominal & Info</th>
+                                    <th class="p-5 w-32 text-right">Gateway</th>
                                 </tr>
                             </thead>
-                            <tbody id="ledger-body" class="divide-y divide-slate-50"></tbody>
+                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -128,138 +122,213 @@
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('sawargi_v12_db')) || [];
-        let activeMode = 'UPDATE';
+        let db = JSON.parse(localStorage.getItem('swg_v8')) || [];
+        let currentMode = 'UPDATE';
 
-        // --- AUTH ---
-        function doAuth() {
-            const u = document.getElementById('u_name').value.toLowerCase();
-            const p = document.getElementById('u_pass').value;
+        // --- AUTH LOGIC ---
+        function handleLogin() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
             if(u === "sawargi@" && p === "456") {
-                sessionStorage.setItem('swg_v12_auth', 'ok');
-                checkStatus();
+                sessionStorage.setItem('isAuth', 'true');
+                checkSession();
             } else {
-                document.getElementById('err-msg').classList.remove('hidden');
-                setTimeout(() => document.getElementById('err-msg').classList.add('hidden'), 2000);
+                const err = document.getElementById('err');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 2000);
             }
         }
 
-        function checkStatus() {
-            if(sessionStorage.getItem('swg_v12_auth') === 'ok') {
-                document.getElementById('login-page').classList.add('hidden');
+        function checkSession() {
+            if(sessionStorage.getItem('isAuth') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('in-date').valueAsDate = new Date();
-                render();
+                document.getElementById('f-date').valueAsDate = new Date();
+                refreshUI();
             }
         }
 
-        function logout() { sessionStorage.clear(); location.reload(); }
-
-        // --- CORE ---
-        function fmtCur(e) {
-            let v = e.value.replace(/\D/g, "");
-            e.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        function handleLogout() {
+            sessionStorage.clear();
+            location.reload();
         }
 
-        function setMode(m) {
-            activeMode = m;
-            document.getElementById('btn-up').className = m === 'UPDATE' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400";
-            document.getElementById('btn-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-rose-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400";
-            document.getElementById('submit-btn').className = m === 'UPDATE' ? "w-full bg-blue-600 text-white py-4 rounded-xl font-black text-xs tracking-[0.3em] uppercase shadow-lg shadow-blue-100 mt-2" : "w-full bg-rose-500 text-white py-4 rounded-xl font-black text-xs tracking-[0.3em] uppercase shadow-lg shadow-rose-100 mt-2";
+        // --- THEME LOGIC ---
+        function updateInputTheme() {
+            const gw = document.getElementById('f-gw').value;
+            const inputs = ['f-date', 'f-gw', 'f-nom', 'f-note'];
+            const nomInput = document.getElementById('f-nom');
+            
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('focus-blue', 'focus-amber', 'focus-indigo');
+                
+                if(gw === 'Tripay Kliring') {
+                    el.classList.add('focus-amber');
+                    nomInput.style.color = "#b45309"; // Amber-700
+                } else if(gw === 'Tripay Tersedia') {
+                    el.classList.add('focus-indigo');
+                    nomInput.style.color = "#4338ca"; // Indigo-700
+                } else {
+                    el.classList.add('focus-blue');
+                    nomInput.style.color = "#2563eb"; // Blue-600
+                }
+            });
         }
 
-        function saveRecord() {
-            const nom = parseInt(document.getElementById('in-nom').value.replace(/\./g, "")) || 0;
-            const tgl = document.getElementById('in-date').value;
-            const gw = document.getElementById('in-gw').value;
-            const note = document.getElementById('in-note').value || '-';
+        // --- CORE LOGIC ---
+        function formatRupiah(el) {
+            let v = el.value.replace(/\D/g, "");
+            el.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-            if(!nom || !tgl) return alert("Nominal dan Tanggal harus diisi!");
+        function changeMode(m) {
+            currentMode = m;
+            const up = document.getElementById('mode-up');
+            const wd = document.getElementById('mode-wd');
+            const btn = document.getElementById('btn-save');
+            
+            if(m === 'UPDATE') {
+                up.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm";
+                wd.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
+                btn.className = "w-full btn-primary text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg";
+                btn.innerText = "Simpan Laporan";
+            } else {
+                wd.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-rose-600 shadow-sm";
+                up.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
+                btn.className = "w-full bg-rose-500 text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg";
+                btn.innerText = "Konfirmasi Penarikan";
+            }
+        }
 
-            db.unshift({
-                id: Date.now(), mode: activeMode, gw, nom, note,
-                d: tgl.split('-').reverse().join('/'),
-                raw: tgl,
-                t: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+        function saveData() {
+            const nom = parseInt(document.getElementById('f-nom').value.replace(/\./g, "")) || 0;
+            const date = document.getElementById('f-date').value;
+            const gw = document.getElementById('f-gw').value;
+            const note = document.getElementById('f-note').value || '-';
+
+            if(!nom || !date) return alert("Mohon lengkapi nominal dan tanggal!");
+
+            const payload = {
+                id: Date.now(),
+                mode: currentMode,
+                gw, nom, note,
+                date: date.split('-').reverse().join('/'),
+                rawDate: date,
+                monthName: new Date(date).toLocaleString('id-ID', { month: 'long' }),
+                yearName: new Date(date).getFullYear(),
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+            };
+
+            db.unshift(payload);
+            db.sort((a,b) => new Date(b.rawDate) - new Date(a.rawDate) || b.id - a.id);
+            localStorage.setItem('swg_v8', JSON.stringify(db));
+            
+            document.getElementById('f-nom').value = '';
+            document.getElementById('f-note').value = '';
+            refreshUI();
+        }
+
+        function refreshUI() {
+            const body = document.getElementById('table-body');
+            body.innerHTML = '';
+            let balances = { "Gopay": 0, "Tripay Tersedia": 0, "Tripay Kliring": 0, "Qiospay": 0 };
+
+            Object.keys(balances).forEach(key => {
+                const filtered = db.filter(i => i.gw === key).reverse();
+                let current = 0;
+                filtered.forEach(item => {
+                    if(item.mode === 'UPDATE') current = item.nom;
+                    else current -= item.nom;
+                });
+                balances[key] = current;
             });
 
-            db.sort((a,b) => new Date(b.raw) - new Date(a.raw) || b.id - a.id);
-            localStorage.setItem('sawargi_v12_db', JSON.stringify(db));
-            document.getElementById('in-nom').value = '';
-            document.getElementById('in-note').value = '';
-            render();
-        }
+            document.getElementById('bal-gopay').innerText = "Rp " + balances["Gopay"].toLocaleString('id-ID');
+            document.getElementById('bal-tr').innerText = "Rp " + balances["Tripay Tersedia"].toLocaleString('id-ID');
+            document.getElementById('bal-tk').innerText = "Rp " + balances["Tripay Kliring"].toLocaleString('id-ID');
+            const total = Object.values(balances).reduce((a, b) => a + b, 0);
+            document.getElementById('bal-total').innerText = "Rp " + total.toLocaleString('id-ID');
 
-        function render() {
-            const list = document.getElementById('ledger-body'); list.innerHTML = '';
-            let bal = { "GOPAY": 0, "TRIPAY TERSEDIA": 0, "TRIPAY KLIRING": 0, "QIOSPAY": 0 };
+            db.forEach(item => {
+                const isWD = item.mode === 'WD';
+                let gwColor = "text-blue-600";
+                if(item.gw === "Tripay Kliring") gwColor = "text-amber-600";
+                if(item.gw === "Tripay Tersedia") gwColor = "text-indigo-600";
 
-            Object.keys(bal).forEach(k => {
-                db.filter(i => i.gw === k).reverse().forEach(i => bal[k] = i.mode === 'UPDATE' ? i.nom : bal[k] - i.nom);
-            });
-
-            document.getElementById('v-gopay').innerText = "Rp " + bal.GOPAY.toLocaleString('id-ID');
-            document.getElementById('v-tr').innerText = "Rp " + bal["TRIPAY TERSEDIA"].toLocaleString('id-ID');
-            document.getElementById('v-tk').innerText = "Rp " + bal["TRIPAY KLIRING"].toLocaleString('id-ID');
-            document.getElementById('v-total').innerText = "Rp " + Object.values(bal).reduce((a,b) => a+b, 0).toLocaleString('id-ID');
-
-            db.forEach(i => {
-                const isWD = i.mode === 'WD';
-                list.innerHTML += `
-                <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="font-bold text-xs">${i.d}<br><span class="text-[9px] text-slate-300 font-medium uppercase">${i.t} WIB</span></td>
-                    <td class="text-center">
-                        <span class="px-2 py-1 rounded text-[8px] font-black ${isWD ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-blue-50 text-blue-500 border border-blue-100'} uppercase">${i.mode}</span>
+                body.innerHTML += `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-5 font-bold text-xs">
+                        ${item.date}<br>
+                        <span class="text-[9px] text-slate-400 font-medium">${item.time} WIB</span>
                     </td>
-                    <td>
-                        <p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">${isWD ? '-' : ''}Rp ${i.nom.toLocaleString('id-ID')}</p>
-                        <p class="text-[10px] text-slate-400 font-medium uppercase truncate max-w-[200px]">${i.note}</p>
+                    <td class="p-5 text-center">
+                        <span class="px-2 py-1 rounded-md text-[8px] font-black tracking-tighter ${isWD ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-blue-50 text-blue-500 border border-blue-100'}">
+                            ${item.mode}
+                        </span>
                     </td>
-                    <td class="text-right font-black text-[10px] ${i.gw.includes('KLIRING') ? 'text-amber-500' : 'text-blue-600'} italic">
-                        ${i.gw}
-                        <button onclick="delItem(${i.id})" class="ml-4 text-slate-200 hover:text-rose-500 transition-all text-sm">✕</button>
+                    <td class="p-5">
+                        <p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">
+                            ${isWD ? '-' : ''}Rp ${item.nom.toLocaleString('id-ID')}
+                        </p>
+                        <p class="text-[9px] text-slate-400 uppercase font-medium truncate max-w-[150px]">${item.note}</p>
+                    </td>
+                    <td class="p-5 text-right font-black text-[9px] ${gwColor} uppercase italic">
+                        ${item.gw}
+                        <button onclick="removeItem(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500 transition-colors">✕</button>
                     </td>
                 </tr>`;
             });
         }
 
-        function delItem(id) { if(confirm("Hapus baris ini?")) { db = db.filter(i => i.id !== id); localStorage.setItem('sawargi_v12_db', JSON.stringify(db)); render(); } }
-        function resetData() { if(confirm("HAPUS SEMUA DATA?")) { db = []; localStorage.removeItem('sawargi_v12_db'); render(); } }
+        function removeItem(id) {
+            if(confirm("Hapus baris ini?")) {
+                db = db.filter(i => i.id !== id);
+                localStorage.setItem('swg_v8', JSON.stringify(db));
+                refreshUI();
+            }
+        }
 
-        // --- EXCEL ---
+        function clearAll() {
+            if(confirm("Hapus SEMUA data ledger? Tindakan ini tidak bisa dibatalkan.")) {
+                db = []; localStorage.removeItem('swg_v8'); refreshUI();
+            }
+        }
+
+        // --- EXCEL EXPORT WITH SMART NAMING ---
         function downloadExcel() {
-            if(db.length === 0) return alert("Belum ada data!");
-            const d = new Date();
-            const fn = `SAWARGIPAY_${d.getDate()}_${d.getMonth()+1}_${d.getFullYear()}.xlsx`;
+            if(db.length === 0) return alert("Belum ada data untuk diekspor!");
             
-            const excelRows = db.map((i, idx) => ({
+            // Ambil info bulan & tahun dari data terbaru atau hari ini
+            const latestData = db[0];
+            const fileNameDate = latestData.monthName + "_" + latestData.yearName;
+
+            const dataExcel = db.map((i, idx) => ({
                 "NO": db.length - idx,
-                "TANGGAL": i.d,
-                "WAKTU": i.t,
-                "METODE": i.gw,
-                "JENIS": i.mode,
+                "TANGGAL": i.date,
+                "JAM": i.time,
+                "GATEWAY": i.gw,
+                "AKSI": i.mode === 'UPDATE' ? "MASUK/SALDO" : "PENARIKAN",
                 "NOMINAL": i.nom,
                 "CATATAN": i.note
             }));
 
-            const ws = XLSX.utils.json_to_sheet(excelRows);
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for(let R = range.s.r + 1; R <= range.e.r; ++R) {
-                const cell = ws[XLSX.utils.encode_cell({r:R, c:5})];
-                if(cell) cell.t = 'n';
-            }
+            const ws = XLSX.utils.json_to_sheet(dataExcel);
+            ws['!cols'] = [{wch: 5}, {wch: 15}, {wch: 10}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 35}];
 
-            ws['!cols'] = [{wch:5}, {wch:15}, {wch:10}, {wch:25}, {wch:15}, {wch:20}, {wch:40}];
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Financial_Report");
-            XLSX.writeFile(wb, fn);
+            XLSX.utils.book_append_sheet(wb, ws, "SawargiPay_Ledger");
+            
+            // Nama file dinamis berdasarkan bulan dan tahun
+            XLSX.writeFile(wb, `Laporan_SawargiPay_${fileNameDate}.xlsx`);
         }
 
         setInterval(() => {
-            document.getElementById('real-time').innerText = new Date().toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            const n = new Date();
+            document.getElementById('clock').innerText = n.toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
         }, 1000);
 
-        window.onload = checkStatus;
+        window.onload = checkSession;
     </script>
 </body>
 </html>
