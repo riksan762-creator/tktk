@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v8 | Ultra-Light Pro</title>
+    <title>SawargiPay v8 | Pro Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
         .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 12px !important; outline: none !important; transition: all 0.2s; }
         
-        /* Dynamic Focus Colors */
+        /* Tema Warna Input Dinamis */
         .focus-blue:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         .focus-amber:focus { border-color: #f59e0b !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
         .focus-indigo:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
@@ -49,21 +49,21 @@
                 <p id="clock" class="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase"></p>
             </div>
             <div class="flex gap-2">
-                <button onclick="downloadExcel()" class="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-md shadow-emerald-50">Download Excel</button>
+                <button onclick="downloadExcel()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md shadow-emerald-50">Download Excel</button>
                 <button onclick="handleLogout()" class="bg-slate-100 text-slate-500 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-500 transition-all">Logout</button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="glass-card p-5 border-l-4 border-blue-500">
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Gopay</span>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Gopay Balance</span>
                 <h3 id="bal-gopay" class="text-xl font-black text-slate-800 mt-1">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 border-l-4 border-indigo-500 bg-indigo-50/10">
-                <span class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">Tripay Tersedia</span>
+            <div class="glass-card p-5 border-l-4 border-indigo-600 bg-indigo-50/20">
+                <span class="text-[9px] font-bold text-indigo-600 uppercase tracking-widest">Tripay Tersedia</span>
                 <h3 id="bal-tr" class="text-xl font-black text-indigo-900 mt-1">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/20">
+            <div class="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/30">
                 <span class="text-[9px] font-bold text-amber-600 uppercase tracking-widest">Tripay Kliring</span>
                 <h3 id="bal-tk" class="text-xl font-black text-amber-700 mt-1">Rp 0</h3>
             </div>
@@ -75,15 +75,16 @@
 
         <div class="grid lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4">
-                <div class="glass-card p-6 space-y-4 sticky top-6" id="entry-card">
+                <div class="glass-card p-6 space-y-4 sticky top-6">
                     <h2 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Entry Data</h2>
                     <div class="flex bg-slate-100 p-1 rounded-xl">
-                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm transition-all">Update</button>
-                        <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400 transition-all">Withdraw</button>
+                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm">Update</button>
+                        <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400">Withdraw</button>
                     </div>
+                    
                     <input type="date" id="f-date" class="w-full p-3.5 input-style font-bold text-sm focus-blue">
                     
-                    <select id="f-gw" onchange="updateInputTheme()" class="w-full p-3.5 input-style font-bold text-sm appearance-none focus-blue">
+                    <select id="f-gw" onchange="updateUITheme()" class="w-full p-3.5 input-style font-bold text-sm appearance-none focus-blue">
                         <option value="Gopay">Auto Gopay</option>
                         <option value="Tripay Tersedia">Tripay Engine (Tersedia)</option>
                         <option value="Tripay Kliring">Tripay Engine (Kliring)</option>
@@ -125,7 +126,7 @@
         let db = JSON.parse(localStorage.getItem('swg_v8')) || [];
         let currentMode = 'UPDATE';
 
-        // --- AUTH LOGIC ---
+        // --- AUTH ---
         function handleLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
@@ -133,9 +134,8 @@
                 sessionStorage.setItem('isAuth', 'true');
                 checkSession();
             } else {
-                const err = document.getElementById('err');
-                err.classList.remove('hidden');
-                setTimeout(() => err.classList.add('hidden'), 2000);
+                document.getElementById('err').classList.remove('hidden');
+                setTimeout(() => document.getElementById('err').classList.add('hidden'), 2000);
             }
         }
 
@@ -153,30 +153,25 @@
             location.reload();
         }
 
-        // --- THEME LOGIC ---
-        function updateInputTheme() {
+        // --- THEME DYNAMICS ---
+        function updateUITheme() {
             const gw = document.getElementById('f-gw').value;
-            const inputs = ['f-date', 'f-gw', 'f-nom', 'f-note'];
             const nomInput = document.getElementById('f-nom');
+            const allInputs = [document.getElementById('f-date'), document.getElementById('f-gw'), nomInput, document.getElementById('f-note')];
             
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
+            allInputs.forEach(el => {
                 el.classList.remove('focus-blue', 'focus-amber', 'focus-indigo');
-                
-                if(gw === 'Tripay Kliring') {
-                    el.classList.add('focus-amber');
-                    nomInput.style.color = "#b45309"; // Amber-700
-                } else if(gw === 'Tripay Tersedia') {
-                    el.classList.add('focus-indigo');
-                    nomInput.style.color = "#4338ca"; // Indigo-700
-                } else {
-                    el.classList.add('focus-blue');
-                    nomInput.style.color = "#2563eb"; // Blue-600
-                }
+                if(gw === 'Tripay Kliring') el.classList.add('focus-amber');
+                else if(gw === 'Tripay Tersedia') el.classList.add('focus-indigo');
+                else el.classList.add('focus-blue');
             });
+
+            if(gw === 'Tripay Kliring') nomInput.style.color = "#d97706";
+            else if(gw === 'Tripay Tersedia') nomInput.style.color = "#4f46e5";
+            else nomInput.style.color = "#2563eb";
         }
 
-        // --- CORE LOGIC ---
+        // --- LOGIC ---
         function formatRupiah(el) {
             let v = el.value.replace(/\D/g, "");
             el.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -192,31 +187,32 @@
                 up.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm";
                 wd.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
                 btn.className = "w-full btn-primary text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg";
-                btn.innerText = "Simpan Laporan";
             } else {
                 wd.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-rose-600 shadow-sm";
                 up.className = "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
                 btn.className = "w-full bg-rose-500 text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg";
-                btn.innerText = "Konfirmasi Penarikan";
             }
         }
 
         function saveData() {
             const nom = parseInt(document.getElementById('f-nom').value.replace(/\./g, "")) || 0;
-            const date = document.getElementById('f-date').value;
+            const dateInput = document.getElementById('f-date').value;
             const gw = document.getElementById('f-gw').value;
             const note = document.getElementById('f-note').value || '-';
 
-            if(!nom || !date) return alert("Mohon lengkapi nominal dan tanggal!");
+            if(!nom || !dateInput) return alert("Nominal dan Tanggal wajib diisi!");
+
+            const dObj = new Date(dateInput);
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
             const payload = {
                 id: Date.now(),
                 mode: currentMode,
                 gw, nom, note,
-                date: date.split('-').reverse().join('/'),
-                rawDate: date,
-                monthName: new Date(date).toLocaleString('id-ID', { month: 'long' }),
-                yearName: new Date(date).getFullYear(),
+                date: dateInput.split('-').reverse().join('/'),
+                rawDate: dateInput,
+                monthName: months[dObj.getMonth()],
+                year: dObj.getFullYear(),
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
             };
 
@@ -252,9 +248,9 @@
 
             db.forEach(item => {
                 const isWD = item.mode === 'WD';
-                let gwColor = "text-blue-600";
-                if(item.gw === "Tripay Kliring") gwColor = "text-amber-600";
-                if(item.gw === "Tripay Tersedia") gwColor = "text-indigo-600";
+                let gwStyle = "text-blue-600";
+                if(item.gw === "Tripay Kliring") gwStyle = "text-amber-600";
+                if(item.gw === "Tripay Tersedia") gwStyle = "text-indigo-600";
 
                 body.innerHTML += `
                 <tr class="hover:bg-slate-50 transition-colors">
@@ -273,9 +269,9 @@
                         </p>
                         <p class="text-[9px] text-slate-400 uppercase font-medium truncate max-w-[150px]">${item.note}</p>
                     </td>
-                    <td class="p-5 text-right font-black text-[9px] ${gwColor} uppercase italic">
+                    <td class="p-5 text-right font-black text-[9px] ${gwStyle} uppercase italic">
                         ${item.gw}
-                        <button onclick="removeItem(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500 transition-colors">✕</button>
+                        <button onclick="removeItem(${item.id})" class="ml-3 text-slate-300 hover:text-rose-500">✕</button>
                     </td>
                 </tr>`;
             });
@@ -290,42 +286,39 @@
         }
 
         function clearAll() {
-            if(confirm("Hapus SEMUA data ledger? Tindakan ini tidak bisa dibatalkan.")) {
+            if(confirm("Hapus semua data?")) {
                 db = []; localStorage.removeItem('swg_v8'); refreshUI();
             }
         }
 
-        // --- EXCEL EXPORT WITH SMART NAMING ---
+        // --- EXCEL SMART NAMING ---
         function downloadExcel() {
-            if(db.length === 0) return alert("Belum ada data untuk diekspor!");
+            if(db.length === 0) return alert("Tidak ada data!");
             
-            // Ambil info bulan & tahun dari data terbaru atau hari ini
-            const latestData = db[0];
-            const fileNameDate = latestData.monthName + "_" + latestData.yearName;
+            // Mengambil bulan/tahun dari data paling atas di tabel
+            const ref = db[0];
+            const namaFile = `Laporan_SawargiPay_${ref.monthName}_${ref.year}.xlsx`;
 
             const dataExcel = db.map((i, idx) => ({
                 "NO": db.length - idx,
                 "TANGGAL": i.date,
                 "JAM": i.time,
                 "GATEWAY": i.gw,
-                "AKSI": i.mode === 'UPDATE' ? "MASUK/SALDO" : "PENARIKAN",
+                "AKSI": i.mode,
                 "NOMINAL": i.nom,
                 "CATATAN": i.note
             }));
 
             const ws = XLSX.utils.json_to_sheet(dataExcel);
             ws['!cols'] = [{wch: 5}, {wch: 15}, {wch: 10}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 35}];
-
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "SawargiPay_Ledger");
+            XLSX.utils.book_append_sheet(wb, ws, "Ledger");
             
-            // Nama file dinamis berdasarkan bulan dan tahun
-            XLSX.writeFile(wb, `Laporan_SawargiPay_${fileNameDate}.xlsx`);
+            XLSX.writeFile(wb, namaFile);
         }
 
         setInterval(() => {
-            const n = new Date();
-            document.getElementById('clock').innerText = n.toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
         }, 1000);
 
         window.onload = checkSession;
