@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v11.0 | Diamond</title>
+    <title>SawargiPay v11.5 | Ultimate Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfe; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfe; color: #1e293b; }
         .glass-card { background: #ffffff; border-radius: 24px; border: 1px solid #edf2f7; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 14px !important; outline: none !important; }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
@@ -22,8 +22,8 @@
     <div id="login-screen">
         <div class="glass-card p-10 w-full max-w-sm text-center">
             <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-8">SAWAR<span class="text-slate-800">GIPAY</span></h1>
-            <input type="password" id="pass" placeholder="PIN Akses" class="w-full p-4 input-style font-semibold text-center mb-4">
-            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">Login</button>
+            <input type="password" id="pass" placeholder="PIN" class="w-full p-4 input-style font-semibold text-center mb-4">
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase">Masuk</button>
         </div>
     </div>
 
@@ -35,7 +35,7 @@
 
         <div class="grid lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4">
-                <div class="glass-card p-6 space-y-4 sticky top-6">
+                <div class="glass-card p-6 space-y-4">
                     <div class="flex bg-slate-100 p-1 rounded-xl">
                         <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm">Update</button>
                         <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-3 rounded-lg text-[10px] font-black uppercase text-slate-400">Withdraw</button>
@@ -46,24 +46,26 @@
                         <option value="Tripay Gateway">Tripay Gateway</option>
                         <option value="Qiospay Gateway">Qiospay Gateway</option>
                     </select>
-                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Rp 0" class="w-full p-5 text-2xl input-style font-black text-blue-600 text-center">
-                    <input type="text" id="f-note" placeholder="Catatan Transaksi..." class="w-full p-3.5 input-style text-sm font-semibold">
-                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-5 rounded-2xl font-bold uppercase shadow-xl tracking-wider">Simpan Transaksi</button>
+                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-5 text-2xl input-style font-black text-blue-600 text-center">
+                    <input type="text" id="f-note" placeholder="Keterangan..." class="w-full p-3.5 input-style text-sm font-semibold">
+                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-5 rounded-2xl font-bold uppercase shadow-xl">SIMPAN & SINKRON</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="glass-card overflow-hidden min-h-[500px]">
-                    <div class="p-6 border-b bg-slate-50/30 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Ledger History</span>
+                <div class="glass-card overflow-hidden">
+                    <div class="p-6 border-b bg-slate-50 flex justify-between items-center">
+                        <span class="text-[10px] font-black text-slate-400 uppercase">Live Ledger History</span>
                         <div class="flex gap-2">
-                            <button onclick="downloadExcel()" class="btn-excel text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase shadow-md">Download XLS</button>
-                            <button onclick="fetchCloudData()" class="bg-white border border-slate-200 text-slate-400 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Refresh ↻</button>
+                            <button onclick="downloadExcel()" class="btn-excel text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">Download XLS</button>
+                            <button onclick="fetchCloudData()" class="bg-white border text-slate-400 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Refresh ↻</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto min-h-[400px]">
                         <table class="w-full text-left">
-                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
+                            <tbody id="table-body" class="divide-y divide-slate-50">
+                                <tr><td class="p-20 text-center text-xs text-slate-300 italic">Memuat data...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -96,48 +98,39 @@
         async function fetchCloudData() {
             const body = document.getElementById('table-body');
             try {
-                // FIXED: Mengarah langsung ke /secret/ledger sesuai screenshot Bapak
+                // Memanggil path sesuai screenshot Bapak: /secret/ledger.json
                 const res = await fetch(`${FB_URL}/secret/ledger.json`);
+                if(!res.ok) throw new Error("Gagal akses database");
+                
                 const data = await res.json();
                 body.innerHTML = '';
                 
                 if(!data) {
                     rawData = [];
-                    body.innerHTML = '<tr><td class="p-20 text-center text-xs text-slate-300 italic font-medium">Data di folder ledger masih kosong.</td></tr>';
+                    body.innerHTML = '<tr><td class="p-20 text-center text-xs text-slate-300 font-bold uppercase italic">Data di Firebase masih kosong atau salah path.</td></tr>';
                     return;
                 }
 
                 rawData = Object.values(data).sort((a,b) => b.id - a.id);
                 rawData.forEach(item => {
                     const isWD = item.mode === 'WD';
-                    // Proteksi agar tidak NaN
-                    const nominal = parseInt(item.nom || 0);
-                    
                     body.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-5">
-                            <div class="text-[11px] font-bold text-slate-800">${item.date || '00/00/0000'}</div>
-                            <div class="text-[9px] text-slate-300 font-bold uppercase">${item.time || '00:00'} WIB</div>
-                        </td>
-                        <td class="p-5">
-                            <span class="px-2 py-1 rounded text-[8px] font-black uppercase ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode || 'UP'}</span>
-                        </td>
-                        <td class="p-5">
-                            <div class="text-sm font-black ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${nominal.toLocaleString('id-ID')}</div>
-                            <div class="text-[9px] text-slate-400 font-bold italic">${item.note || '-'}</div>
-                        </td>
-                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw || 'MANUAL'}</td>
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-5 font-bold text-[11px]">${item.date}<br><span class="text-slate-300 font-normal uppercase">${item.time} WIB</span></td>
+                        <td class="p-5"><span class="px-2 py-1 rounded text-[8px] font-black uppercase ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
+                        <td class="p-5 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${parseInt(item.nom || 0).toLocaleString('id-ID')}<br><span class="text-[9px] text-slate-400 font-bold italic">${item.note || '-'}</span></td>
+                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw}</td>
                     </tr>`;
                 });
             } catch (e) { 
-                body.innerHTML = '<tr><td class="p-10 text-center text-rose-500 text-xs font-bold font-mono">ERR: DATABASE_OFFLINE</td></tr>'; 
+                body.innerHTML = `<tr><td class="p-20 text-center text-rose-500 text-xs font-bold uppercase">Error: ${e.message}</td></tr>`;
             }
         }
 
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
-            if(!nom) return alert("Nominal wajib diisi!");
+            if(!nom) return alert("Isi nominal!");
 
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerText = "SINKRON...";
@@ -153,27 +146,21 @@
             };
 
             try {
-                // Simpan ke path /secret/ledger sesuai struktur Firebase Bapak
                 await fetch(`${FB_URL}/secret/ledger/${payload.id}.json`, { method: 'PUT', body: JSON.stringify(payload) });
                 document.getElementById('f-nom').value = '';
                 document.getElementById('f-note').value = '';
                 setTimeout(fetchCloudData, 500);
-            } catch (e) { alert("Gagal Simpan! Periksa Koneksi."); }
-            btn.disabled = false; btn.innerText = "Simpan Transaksi";
+            } catch (e) { alert("Simpan gagal! Periksa koneksi."); }
+            btn.disabled = false; btn.innerText = "SIMPAN & SINKRON";
         }
 
         function downloadExcel() {
-            if(rawData.length === 0) return alert("Tidak ada data untuk diexport!");
+            if(rawData.length === 0) return alert("Data kosong!");
             const ws = XLSX.utils.json_to_sheet(rawData.map(item => ({
-                "TANGGAL": item.date,
-                "JAM": item.time,
-                "AKSI": item.mode,
-                "NOMINAL": item.nom,
-                "GATEWAY": item.gw,
-                "KETERANGAN": item.note || "-"
+                "TANGGAL": item.date, "WAKTU": item.time, "AKSI": item.mode, "NOMINAL": item.nom, "GATEWAY": item.gw, "NOTE": item.note || "-"
             })));
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "SawargiPay_Laporan");
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan");
             const tgl = new Date().toLocaleDateString('id-ID').replace(/\//g, "");
             XLSX.writeFile(wb, `SawargiPay_Report_${tgl}.xlsx`);
         }
