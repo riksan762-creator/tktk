@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v10.5 | Fixed Cloud</title>
+    <title>SawargiPay v10.7 | Secure Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfe; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 12px !important; outline: none !important; }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transition: 0.2s; }
-        .btn-primary:active { transform: scale(0.95); }
         #login-screen { position: fixed; inset: 0; background: #fdfdfe; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .hidden { display: none !important; }
     </style>
@@ -21,50 +19,21 @@
 
     <div id="login-screen">
         <div class="glass-card p-8 w-full max-w-sm text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter text-blue-600 uppercase mb-6">SAWAR<span class="text-slate-800">GIPAY</span></h1>
-            <div class="space-y-4">
-                <input type="text" id="user" placeholder="Username" class="w-full p-4 input-style font-semibold text-center">
-                <input type="password" id="pass" placeholder="Password" class="w-full p-4 input-style font-semibold text-center">
-                <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">Masuk Sistem</button>
-            </div>
-            <p id="err" class="text-rose-500 text-[10px] mt-4 font-bold hidden">AKSES DITOLAK!</p>
+            <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-6">SAWAR<span class="text-slate-800">GIPAY</span></h1>
+            <input type="password" id="pass" placeholder="PIN Akses" class="w-full p-4 input-style font-semibold text-center mb-4">
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">Login</button>
         </div>
     </div>
 
     <div id="dashboard" class="max-w-6xl mx-auto hidden">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div class="text-center md:text-left">
-                <h1 class="text-2xl font-black italic text-slate-800 uppercase">SAWAR<span class="text-blue-600">GIPAY</span></h1>
-                <p id="clock" class="text-[10px] font-bold text-slate-400 tracking-widest uppercase"></p>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="downloadExcel()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase">Download Excel</button>
-                <button onclick="handleLogout()" class="bg-slate-100 text-slate-500 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase">Logout</button>
-            </div>
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black italic text-slate-800 uppercase">SAWAR<span class="text-blue-600">GIPAY</span></h1>
+            <button onclick="handleLogout()" class="bg-slate-100 text-slate-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase">Logout</button>
         </header>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 text-center sm:text-left">
-            <div class="glass-card p-5 border-l-4 border-blue-500">
-                <span class="text-[9px] font-bold text-slate-400 uppercase">Gopay</span>
-                <h3 id="bal-gopay" class="text-xl font-black">Rp 0</h3>
-            </div>
-            <div class="glass-card p-5 border-l-4 border-indigo-600">
-                <span class="text-[9px] font-bold text-indigo-600 uppercase">Tripay Tersedia</span>
-                <h3 id="bal-tr" class="text-xl font-black">Rp 0</h3>
-            </div>
-            <div class="glass-card p-5 border-l-4 border-amber-500">
-                <span class="text-[9px] font-bold text-amber-600 uppercase">Tripay Kliring</span>
-                <h3 id="bal-tk" class="text-xl font-black">Rp 0</h3>
-            </div>
-            <div class="glass-card p-5 bg-blue-600 text-white border-none shadow-lg">
-                <span class="text-[9px] font-bold text-blue-100 uppercase">Total Asset</span>
-                <h3 id="bal-total" class="text-xl font-black italic">Rp 0</h3>
-            </div>
-        </div>
 
         <div class="grid lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4">
-                <div class="glass-card p-6 space-y-4 sticky top-6">
+                <div class="glass-card p-6 space-y-4">
                     <div class="flex bg-slate-100 p-1 rounded-xl">
                         <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm">Update</button>
                         <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400">Withdraw</button>
@@ -73,33 +42,22 @@
                     <select id="f-gw" class="w-full p-3.5 input-style font-bold text-sm">
                         <option value="Gopay">Auto Gopay</option>
                         <option value="Tripay Tersedia">Tripay (Tersedia)</option>
-                        <option value="Tripay Kliring">Tripay (Kliring)</option>
                         <option value="Qiospay">Qiospay Gateway</option>
                     </select>
-                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-4 text-xl input-style font-black text-blue-600">
-                    <input type="text" id="f-note" placeholder="Keterangan..." class="w-full p-3.5 input-style text-sm">
-                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest">Simpan ke Cloud</button>
+                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-4 text-2xl input-style font-black text-blue-600">
+                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">SIMPAN & SINKRON</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
-                <div class="glass-card overflow-hidden min-h-[450px]">
-                    <div class="p-5 border-b flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Cloud History</span>
-                        <button onclick="fetchCloudData()" class="text-[10px] font-bold text-blue-500 uppercase">Refresh ↻</button>
+                <div class="glass-card min-h-[400px]">
+                    <div class="p-5 border-b bg-slate-50/50 flex justify-between">
+                        <span class="text-[10px] font-black text-slate-400 uppercase">History Live</span>
+                        <button onclick="fetchCloudData()" class="text-blue-500 text-[10px] font-bold">REFRESH</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="bg-white border-b">
-                                <tr class="text-[9px] text-slate-400 uppercase font-black">
-                                    <th class="p-5">Waktu</th>
-                                    <th class="p-5">Aksi</th>
-                                    <th class="p-5">Nominal</th>
-                                    <th class="p-5 text-right">Gateway</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-body" class="divide-y divide-slate-50">
-                                </tbody>
+                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -108,123 +66,75 @@
     </div>
 
     <script>
-        // URL diarahkan ke folder secret (kecil) sesuai database Pak Riksan
         const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app/secret";
-        const SECRET = "456";
-        let db = [];
+        const KEY = "456"; // Ini adalah kunci pembuka pintu rules
         let currentMode = 'UPDATE';
 
         function handleLogin() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            if(u === "sawargi@" && p === SECRET) {
+            if(document.getElementById('pass').value === KEY) {
                 sessionStorage.setItem('isAuth', 'true');
                 checkSession();
-            } else {
-                document.getElementById('err').classList.remove('hidden');
-                setTimeout(() => document.getElementById('err').classList.add('hidden'), 2000);
-            }
+            } else { alert("PIN Salah!"); }
         }
 
-        async function checkSession() {
+        function checkSession() {
             if(sessionStorage.getItem('isAuth') === 'true') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.getElementById('f-date').valueAsDate = new Date();
-                await fetchCloudData();
+                fetchCloudData();
             }
         }
 
-        function handleLogout() { sessionStorage.clear(); location.reload(); }
-
-        // AMBIL DATA
         async function fetchCloudData() {
             try {
-                // Mengambil data dari folder ledger di dalam secret
-                const res = await fetch(`${FB_URL}/ledger.json?auth=${SECRET}`);
+                // Menambahkan auth=KEY agar diizinkan oleh Rules
+                const res = await fetch(`${FB_URL}/ledger.json?auth=${KEY}`);
                 const data = await res.json();
-                db = data ? Object.values(data) : [];
+                const db = data ? Object.values(data) : [];
                 db.sort((a,b) => b.id - a.id);
-                refreshUI();
-            } catch (e) { console.error("Gagal Sinkron!"); }
+                
+                const body = document.getElementById('table-body');
+                body.innerHTML = '';
+                db.forEach(item => {
+                    const isWD = item.mode === 'WD';
+                    body.innerHTML += `
+                    <tr>
+                        <td class="p-5 font-bold text-[11px]">${item.date}<br><span class="text-slate-300 font-normal">${item.time}</span></td>
+                        <td class="p-5 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${parseInt(item.nom).toLocaleString('id-ID')}</td>
+                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase">${item.gw}</td>
+                    </tr>`;
+                });
+            } catch (e) { console.error("Gagal ambil data."); }
         }
 
-        // SIMPAN DATA
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
-            const dateVal = document.getElementById('f-date').value;
-            if(!nom || !dateVal) return alert("Lengkapi data!");
+            if(!nom) return alert("Nominal!");
 
             const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = "MENGIRIM...";
+            btn.disabled = true; btn.innerText = "SINKRON...";
 
             const payload = {
                 id: Date.now(),
                 mode: currentMode,
                 gw: document.getElementById('f-gw').value,
                 nom: nom,
-                note: document.getElementById('f-note').value || '-',
-                date: dateVal.split('-').reverse().join('/'),
+                date: document.getElementById('f-date').value.split('-').reverse().join('/'),
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
             try {
-                // Simpan ke: /secret/ledger/ID.json
-                await fetch(`${FB_URL}/ledger/${payload.id}.json?auth=${SECRET}`, {
+                // Simpan wajib pakai auth=KEY
+                await fetch(`${FB_URL}/ledger/${payload.id}.json?auth=${KEY}`, {
                     method: 'PUT',
                     body: JSON.stringify(payload)
                 });
                 document.getElementById('f-nom').value = '';
-                document.getElementById('f-note').value = '';
-                await fetchCloudData(); // Langsung update tabel
-            } catch (e) { alert("Gagal Simpan ke Cloud!"); }
-            btn.disabled = false; btn.innerText = "SIMPAN KE CLOUD";
-        }
-
-        async function removeItem(id) {
-            if(confirm("Hapus data ini?")) {
-                await fetch(`${FB_URL}/ledger/${id}.json?auth=${SECRET}`, { method: 'DELETE' });
-                await fetchCloudData();
-            }
-        }
-
-        function refreshUI() {
-            const body = document.getElementById('table-body');
-            body.innerHTML = '';
-            let bal = { "Gopay": 0, "Tripay Tersedia": 0, "Tripay Kliring": 0, "Qiospay": 0 };
-
-            // Hitung Saldo
-            Object.keys(bal).forEach(key => {
-                const filtered = db.filter(i => i.gw.includes(key)).reverse();
-                let current = 0;
-                filtered.forEach(item => {
-                    if(item.mode === 'UPDATE') current = item.nom;
-                    else current -= item.nom;
-                });
-                bal[key] = current;
-            });
-
-            document.getElementById('bal-gopay').innerText = "Rp " + bal["Gopay"].toLocaleString('id-ID');
-            document.getElementById('bal-tr').innerText = "Rp " + bal["Tripay Tersedia"].toLocaleString('id-ID');
-            document.getElementById('bal-tk').innerText = "Rp " + bal["Tripay Kliring"].toLocaleString('id-ID');
-            document.getElementById('bal-total').innerText = "Rp " + Object.values(bal).reduce((a, b) => a + b, 0).toLocaleString('id-ID');
-
-            if(db.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-xs text-slate-400 italic">Belum ada history.</td></tr>';
-                return;
-            }
-
-            db.forEach(item => {
-                const isWD = item.mode === 'WD';
-                body.innerHTML += `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-5 font-bold text-xs">${item.date}<br><span class="text-[9px] text-slate-400">${item.time} WIB</span></td>
-                    <td class="p-5"><span class="px-2 py-1 rounded-md text-[8px] font-black ${isWD ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
-                    <td class="p-5"><p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">${isWD ? '-' : ''}Rp ${item.nom.toLocaleString('id-ID')}</p></td>
-                    <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw}<button onclick="removeItem(${item.id})" class="ml-3 text-slate-300">✕</button></td>
-                </tr>`;
-            });
+                setTimeout(fetchCloudData, 800);
+            } catch (e) { alert("Gagal Simpan!"); }
+            btn.disabled = false; btn.innerText = "SIMPAN & SINKRON";
         }
 
         function formatRupiah(el) {
@@ -235,22 +145,10 @@
         function changeMode(m) {
             currentMode = m;
             document.getElementById('mode-up').className = m === 'UPDATE' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
-            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-rose-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
+            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-red-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
         }
 
-        function downloadExcel() {
-            if(db.length === 0) return alert("Data kosong!");
-            const dataExcel = db.map(i => ({ TANGGAL: i.date, JAM: i.time, GATEWAY: i.gw, AKSI: i.mode, NOMINAL: i.nom, CATATAN: i.note }));
-            const ws = XLSX.utils.json_to_sheet(dataExcel);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-            XLSX.writeFile(wb, `SawargiPay_Report.xlsx`);
-        }
-
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        }, 1000);
-
+        function handleLogout() { sessionStorage.clear(); location.reload(); }
         window.onload = checkSession;
     </script>
 </body>
