@@ -3,108 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v22.0 | Financial Engine</title>
+    <title>SawargiPay v23.0 | Stable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
-        .glass-card { background: #ffffff; border-radius: 24px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .input-style { background: #f1f5f9 !important; border: 2px solid transparent !important; border-radius: 14px !important; transition: 0.3s; }
-        .input-style:focus { border-color: #3b82f6 !important; background: white !important; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc; 
+            color: #1e293b;
+            touch-action: pan-x pan-y; /* Mencegah double tap zoom */
+        }
+        .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .input-style { 
+            background: #f1f5f9 !important; 
+            border: 2px solid transparent !important; 
+            border-radius: 12px !important; 
+            font-size: 16px !important; /* Ukuran minimal 16px mencegah auto-zoom di iPhone */
+        }
+        .input-style:focus { border-color: #3b82f6 !important; background: white !important; outline: none; }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
         #login-screen { position: fixed; inset: 0; background: #f8fafc; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
-        /* Badge Styles */
+        /* Badge Colors */
         .badge-gopay { background: #dcfce7; color: #15803d; }
         .badge-tripay { background: #fef3c7; color: #b45309; }
         .badge-kliring { background: #e0f2fe; color: #0369a1; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-3 md:p-6">
 
     <div id="login-screen">
         <div class="glass-card p-8 w-full max-w-sm text-center">
-            <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-6">SAWAR<span class="text-slate-800">GIPAY</span></h1>
+            <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-6 tracking-tighter">SAWAR<span class="text-slate-800">GIPAY</span></h1>
             <input type="password" id="pass" placeholder="PIN" class="w-full p-4 input-style font-bold text-center mb-4">
-            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase shadow-lg">Masuk</button>
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">Login</button>
         </div>
     </div>
 
-    <div id="dashboard" class="max-w-7xl mx-auto hidden">
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-2xl font-black italic text-slate-800 uppercase leading-none">SAWAR<span class="text-blue-600">GIPAY</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest text-right">Platinum v22.0</p>
+    <div id="dashboard" class="max-w-6xl mx-auto hidden">
+        
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            <div class="glass-card p-4 border-l-4 border-green-500">
+                <p class="text-[8px] font-black text-slate-400 uppercase">AutoGopay</p>
+                <p id="bal-gopay" class="text-sm font-black text-slate-800">Rp 0</p>
             </div>
-            <button onclick="handleLogout()" class="bg-white border text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Logout</button>
-        </header>
-
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="glass-card p-5 border-l-4 border-green-500">
-                <p class="text-[9px] font-black text-slate-400 uppercase mb-1">AutoGopay</p>
-                <p id="bal-gopay" class="text-lg font-black text-slate-800">Rp 0</p>
+            <div class="glass-card p-4 border-l-4 border-amber-500">
+                <p class="text-[8px] font-black text-slate-400 uppercase">Tripay Saldo</p>
+                <p id="bal-tripay" class="text-sm font-black text-slate-800">Rp 0</p>
             </div>
-            <div class="glass-card p-5 border-l-4 border-amber-500">
-                <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Tripay Saldo</p>
-                <p id="bal-tripay" class="text-lg font-black text-slate-800">Rp 0</p>
+            <div class="glass-card p-4 border-l-4 border-blue-500">
+                <p class="text-[8px] font-black text-slate-400 uppercase">Kliring Bank</p>
+                <p id="bal-kliring" class="text-sm font-black text-slate-800">Rp 0</p>
             </div>
-            <div class="glass-card p-5 border-l-4 border-blue-500">
-                <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Kliring Bank</p>
-                <p id="bal-kliring" class="text-lg font-black text-slate-800">Rp 0</p>
-            </div>
-            <div class="glass-card p-5 bg-blue-600 border-none">
-                <p class="text-[9px] font-black text-blue-200 uppercase mb-1">Total Keseluruhan</p>
-                <p id="bal-total" class="text-lg font-black text-white">Rp 0</p>
+            <div class="glass-card p-4 bg-slate-900 border-none">
+                <p class="text-[8px] font-black text-slate-400 uppercase">Total Saldo</p>
+                <p id="bal-total" class="text-sm font-black text-white">Rp 0</p>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4">
-                <div class="glass-card p-6 space-y-4 sticky top-6">
+        <div class="grid lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-4 space-y-4">
+                <div class="glass-card p-5 space-y-4">
                     <div class="flex bg-slate-100 p-1 rounded-xl">
-                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm">MASUK (UP)</button>
-                        <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400">KELUAR (WD)</button>
-                    </div>
-                    
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Data Transaksi</label>
-                        <input type="date" id="f-date" class="w-full p-3.5 input-style font-bold text-sm mt-1">
-                        <select id="f-gw" class="w-full p-3.5 input-style font-bold text-sm mt-2">
-                            <option value="AutoGopay">AutoGopay</option>
-                            <option value="Tripay (Saldo)">Tripay (Saldo)</option>
-                            <option value="Kliring Bank">Kliring Bank</option>
-                        </select>
+                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2 rounded-lg text-[9px] font-black bg-white text-blue-600 shadow-sm">MASUK</button>
+                        <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2 rounded-lg text-[9px] font-black text-slate-400">KELUAR</button>
                     </div>
 
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Nominal</label>
-                        <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Rp 0" class="w-full p-4 text-3xl input-style font-black text-blue-600 text-center mt-1">
-                    </div>
+                    <input type="date" id="f-date" class="w-full p-3 input-style font-bold text-sm">
                     
-                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase shadow-lg shadow-blue-200">SINKRON DATA</button>
-                    <button onclick="downloadXLS()" class="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-2xl font-bold text-[10px] uppercase">Export ke Excel (.xls)</button>
+                    <select id="f-gw" class="w-full p-3 input-style font-bold text-sm">
+                        <option value="AutoGopay">AutoGopay</option>
+                        <option value="Tripay (Saldo)">Tripay (Saldo)</option>
+                        <option value="Kliring Bank">Kliring Bank</option>
+                    </select>
+
+                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-4 text-2xl input-style font-black text-blue-600 text-center">
+                    
+                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-md">Simpan Transaksi</button>
+                    <button onclick="downloadXLS()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-[9px] uppercase">Download Excel (.xls)</button>
                 </div>
             </div>
 
             <div class="lg:col-span-8">
                 <div class="glass-card overflow-hidden">
-                    <div class="p-5 border-b bg-slate-50/50 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-400 uppercase">Transaction History</span>
-                        <button onclick="fetchCloudData()" class="text-blue-500 text-[10px] font-bold">REFRESH DATA ↻</button>
+                    <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
+                        <span class="text-[9px] font-black text-slate-400 uppercase">Ledger Transaksi</span>
+                        <button onclick="fetchCloudData()" class="text-blue-500 text-[9px] font-bold">RELOAD ↻</button>
                     </div>
-                    <div class="overflow-x-auto" style="max-height: 600px;">
-                        <table class="w-full text-left">
-                            <thead class="sticky top-0 bg-slate-50 z-10">
-                                <tr class="text-[9px] font-black text-slate-400 uppercase border-b">
-                                    <th class="p-4">Waktu</th>
-                                    <th class="p-4">Tipe</th>
-                                    <th class="p-4">Nominal</th>
-                                    <th class="p-4">Gateway</th>
-                                    <th class="p-4 text-center">Hapus</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-body" class="divide-y divide-slate-50 bg-white"></tbody>
+                    <div class="overflow-x-auto" style="max-height: 500px;">
+                        <table class="w-full text-left border-collapse">
+                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -141,57 +130,49 @@
                 const data = await res.json();
                 body.innerHTML = '';
                 rawData = [];
-                
-                let gopayBal = 0, tripayBal = 0, kliringBal = 0;
+                let gBal = 0, tBal = 0, kBal = 0;
 
                 if(!data) {
-                    updateWidgets(0,0,0);
-                    body.innerHTML = '<tr><td colspan="5" class="p-20 text-center text-xs text-slate-300 italic font-medium">Belum ada transaksi di database.</td></tr>';
+                    updateUI(0,0,0);
+                    body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Data kosong.</td></tr>';
                     return;
                 }
 
                 const list = Object.keys(data).map(key => ({...data[key], fbKey: key}));
                 rawData = list;
 
-                // Hitung Saldo
                 list.forEach(item => {
                     const val = parseInt(item.nom || 0);
-                    const amount = item.mode === 'WD' ? -val : val;
-                    
-                    if(item.gw === 'AutoGopay') gopayBal += amount;
-                    else if(item.gw.includes('Tripay')) tripayBal += amount;
-                    else if(item.gw.includes('Kliring')) kliringBal += amount;
+                    const realVal = item.mode === 'WD' ? -val : val;
+                    if(item.gw === 'AutoGopay') gBal += realVal;
+                    else if(item.gw.includes('Tripay')) tBal += realVal;
+                    else if(item.gw.includes('Kliring')) kBal += realVal;
                 });
 
-                updateWidgets(gopayBal, tripayBal, kliringBal);
+                updateUI(gBal, tBal, kBal);
 
-                // Sort: AutoGopay Selalu Di Atas, sisanya Berdasarkan Waktu Terbaru
-                list.sort((a, b) => {
-                    if (a.gw === 'AutoGopay' && b.gw !== 'AutoGopay') return -1;
-                    if (a.gw !== 'AutoGopay' && b.gw === 'AutoGopay') return 1;
-                    return b.id - a.id;
-                });
+                // Sorting: AutoGopay di atas, lalu ID terbaru
+                list.sort((a,b) => (a.gw === 'AutoGopay' ? -1 : (b.gw === 'AutoGopay' ? 1 : b.id - a.id)));
 
                 list.forEach(item => {
                     const isWD = item.mode === 'WD';
-                    const nominal = parseInt(item.nom || 0);
-                    let gwColor = 'badge-kliring';
-                    if(item.gw === 'AutoGopay') gwColor = 'badge-gopay';
-                    if(item.gw.includes('Tripay')) gwColor = 'badge-tripay';
+                    let badge = 'badge-kliring';
+                    if(item.gw === 'AutoGopay') badge = 'badge-gopay';
+                    if(item.gw.includes('Tripay')) badge = 'badge-tripay';
 
                     body.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 font-bold text-[11px] text-slate-700">${item.date}<br><span class="text-slate-300 font-normal uppercase text-[9px]">${item.time}</span></td>
-                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
-                        <td class="p-4 font-black text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">Rp ${nominal.toLocaleString('id-ID')}</td>
-                        <td class="p-4"><span class="px-2 py-1 rounded-md text-[9px] font-bold uppercase ${gwColor}">${item.gw}</span></td>
-                        <td class="p-4 text-center"><button onclick="deleteData('${item.fbKey}')" class="text-slate-300 hover:text-rose-500 transition">✕</button></td>
+                        <td class="p-4 font-bold text-[10px] text-slate-800">${item.date}<br><span class="text-slate-300 font-normal uppercase text-[8px]">${item.time}</span></td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
+                        <td class="p-4 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${(parseInt(item.nom)).toLocaleString('id-ID')}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-[8px] font-bold uppercase ${badge}">${item.gw}</span></td>
+                        <td class="p-4 text-center"><button onclick="deleteData('${item.fbKey}')" class="text-slate-200 hover:text-red-500">✕</button></td>
                     </tr>`;
                 });
             } catch (e) { console.error(e); }
         }
 
-        function updateWidgets(g, t, k) {
+        function updateUI(g, t, k) {
             document.getElementById('bal-gopay').innerText = `Rp ${g.toLocaleString('id-ID')}`;
             document.getElementById('bal-tripay').innerText = `Rp ${t.toLocaleString('id-ID')}`;
             document.getElementById('bal-kliring').innerText = `Rp ${k.toLocaleString('id-ID')}`;
@@ -201,8 +182,7 @@
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
-            if(!nom) return alert("Nominal 0?");
-
+            if(!nom) return;
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerText = "SINKRON...";
 
@@ -215,30 +195,42 @@
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
-            try {
-                await fetch(`${FB_URL}/${payload.id}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                document.getElementById('f-nom').value = '';
-                fetchCloudData();
-            } catch (e) { alert("Error!"); }
-            btn.disabled = false; btn.innerText = "SINKRON DATA";
+            await fetch(`${FB_URL}/${payload.id}.json`, { method: 'PUT', body: JSON.stringify(payload) });
+            document.getElementById('f-nom').value = '';
+            fetchCloudData();
+            btn.disabled = false; btn.innerText = "Simpan Transaksi";
         }
 
-        async function deleteData(key) {
-            if(!confirm("Hapus transaksi ini?")) return;
-            await fetch(`${FB_URL}/${key}.json`, { method: 'DELETE' });
-            fetchCloudData();
+        async function deleteData(k) {
+            if(confirm("Hapus?")) {
+                await fetch(`${FB_URL}/${k}.json`, { method: 'DELETE' });
+                fetchCloudData();
+            }
         }
 
         function downloadXLS() {
-            const exportData = rawData.map(i => ({ Tanggal: i.date, Jam: i.time, Tipe: i.mode, Nominal: i.nom, Gateway: i.gw }));
+            if(rawData.length === 0) return;
+            // Format data untuk Excel agar nominal jadi angka asli (Number)
+            const exportData = rawData.map(i => ({
+                "Tanggal": i.date,
+                "Waktu": i.time,
+                "Mode": i.mode,
+                "Gateway": i.gw,
+                "Nominal": Number(i.nom) // Dikonversi ke Number agar Excel bisa format currency
+            }));
+
             const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Atur format sel nominal agar punya separator titik/koma di Excel
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for(let R = range.s.r + 1; R <= range.e.r; ++R) {
+                const cell = ws[XLSX.utils.encode_cell({r:R, c:4})];
+                if(cell) cell.z = '#,##0'; // Format ribuan di Excel
+            }
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Financial_Report");
-            XLSX.writeFile(wb, `SPAY_REKAP_${new Date().getTime()}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+            XLSX.writeFile(wb, `SawargiPay_${new Date().getTime()}.xlsx`);
         }
 
         function formatRupiah(el) {
@@ -248,8 +240,8 @@
 
         function changeMode(m) {
             currentMode = m;
-            document.getElementById('mode-up').className = m === 'UPDATE' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-blue-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400";
-            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black bg-white text-rose-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black text-slate-400";
+            document.getElementById('mode-up').className = m === 'UPDATE' ? "flex-1 py-2 rounded-lg text-[9px] font-black bg-white text-blue-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[9px] font-black text-slate-400";
+            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2 rounded-lg text-[9px] font-black bg-white text-red-600 shadow-sm" : "flex-1 py-2 rounded-lg text-[9px] font-black text-slate-400";
         }
 
         function handleLogout() { sessionStorage.clear(); location.reload(); }
