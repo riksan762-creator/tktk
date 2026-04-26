@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v11.5 | Ultimate Fix</title>
+    <title>SawargiPay v12.0 | Final Repair</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
         .glass-card { background: #ffffff; border-radius: 24px; border: 1px solid #edf2f7; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 14px !important; outline: none !important; }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-        .btn-excel { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         #login-screen { position: fixed; inset: 0; background: #fdfdfe; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
     </style>
@@ -48,7 +47,7 @@
                     </select>
                     <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-5 text-2xl input-style font-black text-blue-600 text-center">
                     <input type="text" id="f-note" placeholder="Keterangan..." class="w-full p-3.5 input-style text-sm font-semibold">
-                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-5 rounded-2xl font-bold uppercase shadow-xl">SIMPAN & SINKRON</button>
+                    <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-5 rounded-2xl font-bold uppercase">SIMPAN & SINKRON</button>
                 </div>
             </div>
 
@@ -57,15 +56,13 @@
                     <div class="p-6 border-b bg-slate-50 flex justify-between items-center">
                         <span class="text-[10px] font-black text-slate-400 uppercase">Live Ledger History</span>
                         <div class="flex gap-2">
-                            <button onclick="downloadExcel()" class="btn-excel text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">Download XLS</button>
+                            <button onclick="downloadExcel()" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">Download XLS</button>
                             <button onclick="fetchCloudData()" class="bg-white border text-slate-400 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Refresh ↻</button>
                         </div>
                     </div>
                     <div class="overflow-x-auto min-h-[400px]">
                         <table class="w-full text-left">
-                            <tbody id="table-body" class="divide-y divide-slate-50">
-                                <tr><td class="p-20 text-center text-xs text-slate-300 italic">Memuat data...</td></tr>
-                            </tbody>
+                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -97,17 +94,16 @@
 
         async function fetchCloudData() {
             const body = document.getElementById('table-body');
+            body.innerHTML = '<tr><td class="p-20 text-center text-xs text-slate-300 italic">Mencoba terhubung ke ledger...</td></tr>';
             try {
-                // Memanggil path sesuai screenshot Bapak: /secret/ledger.json
+                // Jalur diperbaiki: /secret/ledger.json
                 const res = await fetch(`${FB_URL}/secret/ledger.json`);
-                if(!res.ok) throw new Error("Gagal akses database");
-                
                 const data = await res.json();
                 body.innerHTML = '';
                 
                 if(!data) {
                     rawData = [];
-                    body.innerHTML = '<tr><td class="p-20 text-center text-xs text-slate-300 font-bold uppercase italic">Data di Firebase masih kosong atau salah path.</td></tr>';
+                    body.innerHTML = '<tr><td class="p-20 text-center text-xs text-slate-400 font-bold uppercase italic">Ledger Kosong. Silakan simpan data baru.</td></tr>';
                     return;
                 }
 
@@ -123,17 +119,17 @@
                     </tr>`;
                 });
             } catch (e) { 
-                body.innerHTML = `<tr><td class="p-20 text-center text-rose-500 text-xs font-bold uppercase">Error: ${e.message}</td></tr>`;
+                body.innerHTML = '<tr><td class="p-20 text-center text-rose-500 text-xs font-bold uppercase">Koneksi Database Terputus!</td></tr>';
             }
         }
 
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
-            if(!nom) return alert("Isi nominal!");
+            if(!nom) return alert("Nominal wajib diisi!");
 
             const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = "SINKRON...";
+            btn.disabled = true; btn.innerText = "MENYIMPAN...";
 
             const payload = {
                 id: Date.now(),
@@ -146,11 +142,12 @@
             };
 
             try {
+                // Simpan ke: /secret/ledger/[ID].json
                 await fetch(`${FB_URL}/secret/ledger/${payload.id}.json`, { method: 'PUT', body: JSON.stringify(payload) });
                 document.getElementById('f-nom').value = '';
                 document.getElementById('f-note').value = '';
-                setTimeout(fetchCloudData, 500);
-            } catch (e) { alert("Simpan gagal! Periksa koneksi."); }
+                fetchCloudData(); 
+            } catch (e) { alert("Gagal menyimpan ke cloud!"); }
             btn.disabled = false; btn.innerText = "SIMPAN & SINKRON";
         }
 
@@ -161,8 +158,7 @@
             })));
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-            const tgl = new Date().toLocaleDateString('id-ID').replace(/\//g, "");
-            XLSX.writeFile(wb, `SawargiPay_Report_${tgl}.xlsx`);
+            XLSX.writeFile(wb, `SawargiPay_Ledger.xlsx`);
         }
 
         function formatRupiah(el) {
