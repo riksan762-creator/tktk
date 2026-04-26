@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v14.0 | Platinum Final</title>
+    <title>SawargiPay v15.0 | Final Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfe; color: #1e293b; }
         .glass-card { background: #ffffff; border-radius: 20px; border: 1px solid #edf2f7; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .input-style { background: #f8fafc !important; border: 1.5px solid #e2e8f0 !important; border-radius: 12px !important; outline: none !important; }
-        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transition: 0.2s; }
-        .btn-excel { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
         #login-screen { position: fixed; inset: 0; background: #fdfdfe; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-4">
 
     <div id="login-screen">
         <div class="glass-card p-8 w-full max-w-sm text-center">
             <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-6">SAWAR<span class="text-slate-800">GIPAY</span></h1>
             <input type="password" id="pass" placeholder="PIN" class="w-full p-4 input-style font-semibold text-center mb-4">
-            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">Login</button>
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase">Login</button>
         </div>
     </div>
 
@@ -37,14 +35,14 @@
             <div class="lg:col-span-4">
                 <div class="glass-card p-6 space-y-4 sticky top-6">
                     <div class="flex bg-slate-100 p-1 rounded-xl">
-                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm">Update</button>
+                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600">Update</button>
                         <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400">Withdraw</button>
                     </div>
                     <input type="date" id="f-date" class="w-full p-3.5 input-style font-bold text-sm">
                     <select id="f-gw" class="w-full p-3.5 input-style font-bold text-sm">
                         <option value="Gopay">Gopay</option>
-                        <option value="Tripay">Tripay Gateway</option>
-                        <option value="Qiospay">Qiospay Gateway</option>
+                        <option value="Tripay">Tripay</option>
+                        <option value="Qiospay">Qiospay</option>
                     </select>
                     <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Nominal Rp" class="w-full p-4 text-2xl input-style font-black text-blue-600 text-center">
                     <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase shadow-lg">SIMPAN & SINKRON</button>
@@ -54,16 +52,12 @@
             <div class="lg:col-span-8">
                 <div class="glass-card overflow-hidden">
                     <div class="p-5 border-b bg-slate-50/50 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">History Transaksi</span>
-                        <div class="flex gap-2">
-                            <button onclick="downloadExcel()" class="btn-excel text-white px-3 py-1.5 rounded-lg text-[9px] font-bold">XLS ↓</button>
-                            <button onclick="fetchCloudData()" class="text-blue-500 text-[10px] font-bold uppercase">Refresh ↻</button>
-                        </div>
+                        <span class="text-[10px] font-black text-slate-400 uppercase">History Transaksi</span>
+                        <button onclick="fetchCloudData()" class="text-blue-500 text-[10px] font-bold">REFRESH ↻</button>
                     </div>
                     <div class="overflow-x-auto min-h-[400px]">
-                        <table class="w-full text-left border-collapse">
-                            <tbody id="table-body" class="divide-y divide-slate-50">
-                            </tbody>
+                        <table class="w-full text-left">
+                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -72,11 +66,10 @@
     </div>
 
     <script>
-        // JALUR DATABASE SESUAI SCREENSHOT BAPAK
+        // JALUR DATABASE SESUAI SCREENSHOT ANDA
         const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app/secret/ledger";
         const KEY = "456";
         let currentMode = 'UPDATE';
-        let rawData = [];
 
         function handleLogin() {
             if(document.getElementById('pass').value === KEY) {
@@ -102,25 +95,23 @@
                 
                 body.innerHTML = '';
                 if(!data) {
-                    rawData = [];
-                    body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Ledger Kosong.</td></tr>';
+                    body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Database Kosong.</td></tr>';
                     return;
                 }
 
-                // Convert Firebase Object ke Array & Urutkan Terbaru
-                rawData = Object.values(data).sort((a,b) => b.id - a.id);
-                
-                rawData.forEach(item => {
+                // Ambil data dan urutkan dari ID terbaru
+                const list = Object.values(data).sort((a,b) => b.id - a.id);
+                list.forEach(item => {
                     const isWD = item.mode === 'WD';
-                    // AMBIL 'nom' SESUAI DATA DI FIREBASE BAPAK
+                    // FIX: Gunakan variabel 'nom' sesuai isi Firebase Anda
                     const nominal = parseInt(item.nom || 0);
                     
                     body.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-5 font-bold text-[11px]">${item.date}<br><span class="text-slate-300 font-normal uppercase">${item.time} WIB</span></td>
-                        <td class="p-5"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-5 font-bold text-[11px]">${item.date || '-'}<br><span class="text-slate-300 font-normal uppercase">${item.time || '-'} WIB</span></td>
+                        <td class="p-5"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode || 'UP'}</span></td>
                         <td class="p-5 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${nominal.toLocaleString('id-ID')}</td>
-                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw}</td>
+                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw || '-'}</td>
                     </tr>`;
                 });
             } catch (e) { body.innerHTML = '<tr><td class="p-10 text-center text-rose-500 text-xs">Gagal memuat data!</td></tr>'; }
@@ -132,35 +123,26 @@
             if(!nom) return alert("Isi nominal!");
 
             const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = "MENYIMPAN...";
+            btn.disabled = true; btn.innerText = "SINKRON...";
 
             const payload = {
                 id: Date.now(),
                 mode: currentMode,
                 gw: document.getElementById('f-gw').value,
-                nom: nom,
+                nom: nom, // Variabel 'nom' agar sama dengan di Firebase Anda
                 date: document.getElementById('f-date').value.split('-').reverse().join('/'),
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
             try {
-                // PUT KE JALUR /secret/ledger/[ID].json
                 await fetch(`${FB_URL}/${payload.id}.json`, {
                     method: 'PUT',
                     body: JSON.stringify(payload)
                 });
                 document.getElementById('f-nom').value = '';
-                fetchCloudData(); // Refresh Tabel
-            } catch (e) { alert("Gagal Simpan!"); }
+                fetchCloudData();
+            } catch (e) { alert("Koneksi gagal!"); }
             btn.disabled = false; btn.innerText = "SIMPAN & SINKRON";
-        }
-
-        function downloadExcel() {
-            if(rawData.length === 0) return alert("Tidak ada data!");
-            const ws = XLSX.utils.json_to_sheet(rawData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Ledger");
-            XLSX.writeFile(wb, `SawargiPay_Report.xlsx`);
         }
 
         function formatRupiah(el) {
