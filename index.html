@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v15.0 | Final Fix</title>
+    <title>SawargiPay v16.0 | Ultra Precision</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
         <div class="glass-card p-8 w-full max-w-sm text-center">
             <h1 class="text-3xl font-black italic text-blue-600 uppercase mb-6">SAWAR<span class="text-slate-800">GIPAY</span></h1>
             <input type="password" id="pass" placeholder="PIN" class="w-full p-4 input-style font-semibold text-center mb-4">
-            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase">Login</button>
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-xl font-bold uppercase">Masuk</button>
         </div>
     </div>
 
@@ -35,7 +35,7 @@
             <div class="lg:col-span-4">
                 <div class="glass-card p-6 space-y-4 sticky top-6">
                     <div class="flex bg-slate-100 p-1 rounded-xl">
-                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600">Update</button>
+                        <button id="mode-up" onclick="changeMode('UPDATE')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm">Update</button>
                         <button id="mode-wd" onclick="changeMode('WD')" class="flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400">Withdraw</button>
                     </div>
                     <input type="date" id="f-date" class="w-full p-3.5 input-style font-bold text-sm">
@@ -52,7 +52,7 @@
             <div class="lg:col-span-8">
                 <div class="glass-card overflow-hidden">
                     <div class="p-5 border-b bg-slate-50/50 flex justify-between items-center">
-                        <span class="text-[10px] font-black text-slate-400 uppercase">History Transaksi</span>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">History Transaksi</span>
                         <button onclick="fetchCloudData()" class="text-blue-500 text-[10px] font-bold">REFRESH ↻</button>
                     </div>
                     <div class="overflow-x-auto min-h-[400px]">
@@ -66,7 +66,7 @@
     </div>
 
     <script>
-        // JALUR DATABASE SESUAI SCREENSHOT ANDA
+        // JALUR DATABASE DIBETULKAN KE /secret/ledger
         const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app/secret/ledger";
         const KEY = "456";
         let currentMode = 'UPDATE';
@@ -95,32 +95,31 @@
                 
                 body.innerHTML = '';
                 if(!data) {
-                    body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Database Kosong.</td></tr>';
+                    body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Ledger Kosong. Coba input data baru.</td></tr>';
                     return;
                 }
 
-                // Ambil data dan urutkan dari ID terbaru
+                // Sorting data terbaru berdasarkan ID
                 const list = Object.values(data).sort((a,b) => b.id - a.id);
                 list.forEach(item => {
                     const isWD = item.mode === 'WD';
-                    // FIX: Gunakan variabel 'nom' sesuai isi Firebase Anda
-                    const nominal = parseInt(item.nom || 0);
+                    const nominal = parseInt(item.nom || 0); // Variabel 'nom' sesuai screenshot
                     
                     body.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-5 font-bold text-[11px]">${item.date || '-'}<br><span class="text-slate-300 font-normal uppercase">${item.time || '-'} WIB</span></td>
-                        <td class="p-5"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode || 'UP'}</span></td>
+                        <td class="p-5 font-bold text-[11px]">${item.date}<br><span class="text-slate-300 font-normal uppercase">${item.time} WIB</span></td>
+                        <td class="p-5"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
                         <td class="p-5 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${nominal.toLocaleString('id-ID')}</td>
-                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw || '-'}</td>
+                        <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw}</td>
                     </tr>`;
                 });
-            } catch (e) { body.innerHTML = '<tr><td class="p-10 text-center text-rose-500 text-xs">Gagal memuat data!</td></tr>'; }
+            } catch (e) { body.innerHTML = '<tr><td class="p-10 text-center text-rose-500 text-xs italic">Gagal memuat history. Cek koneksi internet.</td></tr>'; }
         }
 
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
-            if(!nom) return alert("Isi nominal!");
+            if(!nom) return alert("Isi nominal transaksinya!");
 
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerText = "SINKRON...";
@@ -129,19 +128,25 @@
                 id: Date.now(),
                 mode: currentMode,
                 gw: document.getElementById('f-gw').value,
-                nom: nom, // Variabel 'nom' agar sama dengan di Firebase Anda
+                nom: nom,
                 date: document.getElementById('f-date').value.split('-').reverse().join('/'),
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
             try {
-                await fetch(`${FB_URL}/${payload.id}.json`, {
+                // Proses penyimpanan data ke Firebase
+                const res = await fetch(`${FB_URL}/${payload.id}.json`, {
                     method: 'PUT',
                     body: JSON.stringify(payload)
                 });
-                document.getElementById('f-nom').value = '';
-                fetchCloudData();
-            } catch (e) { alert("Koneksi gagal!"); }
+                
+                if(res.ok) {
+                    document.getElementById('f-nom').value = '';
+                    fetchCloudData(); // Update tabel secara otomatis
+                } else {
+                    alert("Gagal kirim ke database!");
+                }
+            } catch (e) { alert("Masalah jaringan!"); }
             btn.disabled = false; btn.innerText = "SIMPAN & SINKRON";
         }
 
