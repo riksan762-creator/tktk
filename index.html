@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v10.0 | Platinum Cloud</title>
+    <title>SawargiPay v10.5 | Fixed Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -56,7 +56,7 @@
                 <span class="text-[9px] font-bold text-amber-600 uppercase">Tripay Kliring</span>
                 <h3 id="bal-tk" class="text-xl font-black">Rp 0</h3>
             </div>
-            <div class="glass-card p-5 bg-blue-600 text-white border-none shadow-lg shadow-blue-100">
+            <div class="glass-card p-5 bg-blue-600 text-white border-none shadow-lg">
                 <span class="text-[9px] font-bold text-blue-100 uppercase">Total Asset</span>
                 <h3 id="bal-total" class="text-xl font-black italic">Rp 0</h3>
             </div>
@@ -98,7 +98,8 @@
                                     <th class="p-5 text-right">Gateway</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-body" class="divide-y divide-slate-50"></tbody>
+                            <tbody id="table-body" class="divide-y divide-slate-50">
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -107,7 +108,8 @@
     </div>
 
     <script>
-        const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app";
+        // URL diarahkan ke folder secret (kecil) sesuai database Pak Riksan
+        const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app/secret";
         const SECRET = "456";
         let db = [];
         let currentMode = 'UPDATE';
@@ -135,21 +137,24 @@
 
         function handleLogout() { sessionStorage.clear(); location.reload(); }
 
+        // AMBIL DATA
         async function fetchCloudData() {
             try {
+                // Mengambil data dari folder ledger di dalam secret
                 const res = await fetch(`${FB_URL}/ledger.json?auth=${SECRET}`);
                 const data = await res.json();
                 db = data ? Object.values(data) : [];
                 db.sort((a,b) => b.id - a.id);
                 refreshUI();
-            } catch (e) { console.error("Sync Error"); }
+            } catch (e) { console.error("Gagal Sinkron!"); }
         }
 
+        // SIMPAN DATA
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
             const dateVal = document.getElementById('f-date').value;
-            if(!nom || !dateVal) return alert("Isi nominal!");
+            if(!nom || !dateVal) return alert("Lengkapi data!");
 
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerText = "MENGIRIM...";
@@ -161,37 +166,27 @@
                 nom: nom,
                 note: document.getElementById('f-note').value || '-',
                 date: dateVal.split('-').reverse().join('/'),
-                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
             try {
+                // Simpan ke: /secret/ledger/ID.json
                 await fetch(`${FB_URL}/ledger/${payload.id}.json?auth=${SECRET}`, {
                     method: 'PUT',
                     body: JSON.stringify(payload)
                 });
                 document.getElementById('f-nom').value = '';
                 document.getElementById('f-note').value = '';
-                await fetchCloudData();
-            } catch (e) { alert("Gagal Simpan!"); }
+                await fetchCloudData(); // Langsung update tabel
+            } catch (e) { alert("Gagal Simpan ke Cloud!"); }
             btn.disabled = false; btn.innerText = "SIMPAN KE CLOUD";
         }
 
         async function removeItem(id) {
-            if(confirm("Hapus data?")) {
+            if(confirm("Hapus data ini?")) {
                 await fetch(`${FB_URL}/ledger/${id}.json?auth=${SECRET}`, { method: 'DELETE' });
                 await fetchCloudData();
             }
-        }
-
-        function formatRupiah(el) {
-            let v = el.value.replace(/\D/g, "");
-            el.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        function changeMode(m) {
-            currentMode = m;
-            document.getElementById('mode-up').className = m === 'UPDATE' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
-            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-rose-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
         }
 
         function refreshUI() {
@@ -199,7 +194,7 @@
             body.innerHTML = '';
             let bal = { "Gopay": 0, "Tripay Tersedia": 0, "Tripay Kliring": 0, "Qiospay": 0 };
 
-            // Kalkulasi Saldo
+            // Hitung Saldo
             Object.keys(bal).forEach(key => {
                 const filtered = db.filter(i => i.gw.includes(key)).reverse();
                 let current = 0;
@@ -216,20 +211,31 @@
             document.getElementById('bal-total').innerText = "Rp " + Object.values(bal).reduce((a, b) => a + b, 0).toLocaleString('id-ID');
 
             if(db.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-xs text-slate-400 italic">Database Kosong.</td></tr>';
+                body.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-xs text-slate-400 italic">Belum ada history.</td></tr>';
                 return;
             }
 
             db.forEach(item => {
                 const isWD = item.mode === 'WD';
                 body.innerHTML += `
-                <tr class="hover:bg-slate-50 transition-colors">
+                <tr class="hover:bg-slate-50">
                     <td class="p-5 font-bold text-xs">${item.date}<br><span class="text-[9px] text-slate-400">${item.time} WIB</span></td>
                     <td class="p-5"><span class="px-2 py-1 rounded-md text-[8px] font-black ${isWD ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
                     <td class="p-5"><p class="font-black italic text-sm ${isWD ? 'text-rose-500' : 'text-slate-800'}">${isWD ? '-' : ''}Rp ${item.nom.toLocaleString('id-ID')}</p></td>
                     <td class="p-5 text-right font-black text-[9px] text-blue-600 uppercase italic">${item.gw}<button onclick="removeItem(${item.id})" class="ml-3 text-slate-300">✕</button></td>
                 </tr>`;
             });
+        }
+
+        function formatRupiah(el) {
+            let v = el.value.replace(/\D/g, "");
+            el.value = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function changeMode(m) {
+            currentMode = m;
+            document.getElementById('mode-up').className = m === 'UPDATE' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-blue-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
+            document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase bg-white text-rose-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[10px] font-black uppercase text-slate-400";
         }
 
         function downloadExcel() {
