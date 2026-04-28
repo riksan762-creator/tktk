@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v24.0 | Secure</title>
+    <title>SawargiPay v25.0 | Detail Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
             background: #f1f5f9 !important; 
             border: 2px solid transparent !important; 
             border-radius: 14px !important; 
-            font-size: 16px !important; /* Mencegah auto-zoom di iOS */
+            font-size: 16px !important; 
             transition: 0.2s;
         }
         .input-style:focus { border-color: #3b82f6 !important; background: white !important; outline: none; }
@@ -32,7 +32,6 @@
         }
         .hidden { display: none !important; }
         
-        /* Badge Colors */
         .badge-gopay { background: #dcfce7; color: #15803d; }
         .badge-tripay { background: #fef3c7; color: #b45309; }
         .badge-kliring { background: #e0f2fe; color: #0369a1; }
@@ -56,7 +55,7 @@
         <header class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-xl font-black italic text-slate-800 uppercase">SAWAR<span class="text-blue-600">GIPAY</span></h1>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">v24.0 Security Edition</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase">v25.0 Detail Edition</p>
             </div>
             <button onclick="handleLogout()" class="bg-white border border-slate-200 text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-slate-50">Logout</button>
         </header>
@@ -97,7 +96,15 @@
                         </select>
                     </div>
 
-                    <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Rp 0" class="w-full p-4 text-3xl input-style font-black text-blue-600 text-center">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Nominal Transaksi</label>
+                        <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Rp 0" class="w-full p-4 text-3xl input-style font-black text-blue-600 text-center">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Keterangan / Alasan</label>
+                        <input type="text" id="f-note" placeholder="Contoh: Bayar server / Topup" class="w-full p-3.5 input-style font-bold text-sm">
+                    </div>
                     
                     <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase shadow-lg shadow-blue-200">Simpan Data</button>
                     <button onclick="downloadXLS()" class="w-full bg-emerald-500 text-white py-3 rounded-2xl font-bold text-[9px] uppercase shadow-md shadow-emerald-50 mt-2">Unduh Laporan Excel</button>
@@ -110,7 +117,7 @@
                         <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Transaction Records</span>
                         <button onclick="fetchCloudData()" class="text-blue-500 text-[9px] font-bold uppercase">Refresh ↻</button>
                     </div>
-                    <div class="overflow-x-auto" style="max-height: 550px;">
+                    <div class="overflow-x-auto" style="max-height: 600px;">
                         <table class="w-full text-left border-collapse">
                             <tbody id="table-body" class="divide-y divide-slate-50 bg-white"></tbody>
                         </table>
@@ -122,7 +129,7 @@
 
     <script>
         const FB_URL = "https://sawargipay-abe05-default-rtdb.asia-southeast1.firebasedatabase.app/secret/ledger";
-        const KEY = "456"; // PIN BAPAK
+        const KEY = "456";
         let currentMode = 'UPDATE';
         let rawData = [];
 
@@ -170,7 +177,6 @@
 
                 updateUI(gBal, tBal, kBal);
 
-                // Sort: AutoGopay Selalu Atas, baru sisanya terbaru
                 list.sort((a,b) => (a.gw === 'AutoGopay' ? -1 : (b.gw === 'AutoGopay' ? 1 : b.id - a.id)));
 
                 list.forEach(item => {
@@ -181,11 +187,16 @@
 
                     body.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 font-bold text-[10px] text-slate-700">${item.date}<br><span class="text-slate-300 font-normal text-[8px] uppercase">${item.time}</span></td>
-                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[8px] font-black ${isWD ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}">${item.mode}</span></td>
-                        <td class="p-4 font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${(parseInt(item.nom)).toLocaleString('id-ID')}</td>
+                        <td class="p-4">
+                            <p class="font-bold text-[10px] text-slate-700">${item.date}</p>
+                            <p class="text-slate-300 font-normal text-[8px] uppercase">${item.time}</p>
+                        </td>
+                        <td class="p-4">
+                            <p class="font-black text-sm ${isWD ? 'text-red-500' : 'text-slate-800'}">Rp ${(parseInt(item.nom)).toLocaleString('id-ID')}</p>
+                            <p class="text-[9px] text-slate-400 font-bold italic truncate max-w-[150px]">${item.note || '-'}</p>
+                        </td>
                         <td class="p-4"><span class="px-2 py-1 rounded text-[8px] font-bold uppercase ${badge}">${item.gw}</span></td>
-                        <td class="p-4 text-center"><button onclick="deleteData('${item.fbKey}')" class="text-slate-200 hover:text-red-500 transition">✕</button></td>
+                        <td class="p-4 text-center"><button onclick="deleteData('${item.fbKey}')" class="text-slate-200 hover:text-red-500">✕</button></td>
                     </tr>`;
                 });
             } catch (e) { console.error(e); }
@@ -201,6 +212,8 @@
         async function saveData() {
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
+            const note = document.getElementById('f-note').value;
+            
             if(!nom) return;
             const btn = document.getElementById('btn-save');
             btn.disabled = true; btn.innerText = "SINKRON...";
@@ -210,12 +223,14 @@
                 mode: currentMode,
                 gw: document.getElementById('f-gw').value,
                 nom: nom,
+                note: note, // Masukkan keterangan ke database
                 date: document.getElementById('f-date').value.split('-').reverse().join('/'),
                 time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace('.', ':')
             };
 
             await fetch(`${FB_URL}/${payload.id}.json`, { method: 'PUT', body: JSON.stringify(payload) });
             document.getElementById('f-nom').value = '';
+            document.getElementById('f-note').value = ''; // Reset form keterangan
             fetchCloudData();
             btn.disabled = false; btn.innerText = "Simpan Data";
         }
@@ -234,12 +249,11 @@
                 "Waktu": i.time,
                 "Tipe": i.mode,
                 "Gateway": i.gw,
-                "Nominal": Number(i.nom)
+                "Nominal": Number(i.nom),
+                "Keterangan": i.note || "-" // Tambahkan kolom keterangan di Excel
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
-            
-            // Format angka ribuan di Excel
             const range = XLSX.utils.decode_range(ws['!ref']);
             for(let R = range.s.r + 1; R <= range.e.r; ++R) {
                 const cell = ws[XLSX.utils.encode_cell({r:R, c:4})];
@@ -248,7 +262,7 @@
 
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Rekap Laporan");
-            XLSX.writeFile(wb, `SawargiPay_Report_${new Date().getTime()}.xlsx`);
+            XLSX.writeFile(wb, `SawargiPay_Detail_${new Date().getTime()}.xlsx`);
         }
 
         function formatRupiah(el) {
