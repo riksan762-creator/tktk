@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SawargiPay v30.0 | Dual Ledger</title>
+    <title>SawargiPay v31.0 | Excel Accounting</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -29,8 +29,8 @@
         <div class="glass-card p-8 w-full max-w-sm text-center">
             <h1 class="text-3xl font-black italic text-blue-600 uppercase tracking-tighter">SAWAR<span class="text-slate-800">GIPAY</span></h1>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-6">Authorized Access Only</p>
-            <input type="password" id="pass" placeholder="MASUKKAN PIN" class="w-full p-4 input-style font-bold text-center mb-4 tracking-[0.5em]">
-            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase">Buka Dashboard</button>
+            <input type="password" id="pass" placeholder="PIN" class="w-full p-4 input-style font-bold text-center mb-4 tracking-[0.5em]">
+            <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase">Unlock</button>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
         <header class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-xl font-black italic text-slate-800 uppercase">SAWAR<span class="text-blue-600">GIPAY</span></h1>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">v30.0 Dual Ledger</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase">v31.0 Excel Pro Edition</p>
             </div>
             <button onclick="handleLogout()" class="bg-white border border-slate-200 text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Logout</button>
         </header>
@@ -78,7 +78,7 @@
                     <input type="text" id="f-nom" oninput="formatRupiah(this)" placeholder="Rp 0" class="w-full p-4 text-3xl input-style font-black text-blue-600 text-center">
                     <input type="text" id="f-note" placeholder="Keterangan transaksi..." class="w-full p-3.5 input-style font-bold text-sm">
                     <button onclick="saveData()" id="btn-save" class="w-full btn-primary text-white py-4 rounded-2xl font-bold uppercase shadow-lg">Simpan Data</button>
-                    <button onclick="downloadXLS()" class="w-full bg-emerald-500 text-white py-3 rounded-2xl font-bold text-[9px] uppercase mt-2">Unduh Laporan Excel</button>
+                    <button onclick="downloadXLS()" class="w-full bg-emerald-600 text-white py-3 rounded-2xl font-bold text-[9px] uppercase mt-2">Unduh Laporan Excel (.xlsx)</button>
                 </div>
             </div>
 
@@ -126,10 +126,7 @@
                 const res = await fetch(`${FB_URL}.json`);
                 const data = await res.json();
                 rawData = data ? Object.keys(data).map(key => ({...data[key], fbKey: key})) : [];
-                
-                // Urutkan: Paling baru (berdasarkan ID/Timestamp) di paling atas
                 rawData.sort((a, b) => b.id - a.id);
-                
                 calculateBalances();
                 renderTable();
             } catch (e) { console.error(e); }
@@ -153,15 +150,10 @@
         function renderTable() {
             const body = document.getElementById('table-body');
             body.innerHTML = '';
-            
-            // Filter data berdasarkan Tab yang aktif (UP atau WD)
-            const filtered = rawData.filter(item => {
-                if(activeTab === 'UP') return item.mode === 'UPDATE';
-                return item.mode === 'WD';
-            });
+            const filtered = rawData.filter(item => activeTab === 'UP' ? item.mode === 'UPDATE' : item.mode === 'WD');
 
             if(filtered.length === 0) {
-                body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Tidak ada data di kategori ini.</td></tr>';
+                body.innerHTML = '<tr><td class="p-10 text-center text-xs text-slate-300 italic">Kosong.</td></tr>';
                 return;
             }
 
@@ -194,9 +186,8 @@
             const nomRaw = document.getElementById('f-nom').value;
             const nom = parseInt(nomRaw.replace(/\./g, "")) || 0;
             if(!nom) return;
-            
             const btn = document.getElementById('btn-save');
-            btn.disabled = true; btn.innerText = "SINKRON...";
+            btn.disabled = true; btn.innerText = "SAVING...";
 
             const payload = {
                 id: Date.now(),
@@ -211,21 +202,13 @@
             await fetch(`${FB_URL}/${payload.id}.json`, { method: 'PUT', body: JSON.stringify(payload) });
             document.getElementById('f-nom').value = '';
             document.getElementById('f-note').value = '';
-            
-            // Setelah simpan, pastikan tab yang terbuka sesuai dengan data yang baru diinput
             activeTab = currentMode === 'UPDATE' ? 'UP' : 'WD';
             switchTab(activeTab);
-            
             fetchCloudData();
             btn.disabled = false; btn.innerText = "Simpan Data";
         }
 
-        async function deleteData(k) {
-            if(confirm("Hapus data ini?")) {
-                await fetch(`${FB_URL}/${k}.json`, { method: 'DELETE' });
-                fetchCloudData();
-            }
-        }
+        async function deleteData(k) { if(confirm("Hapus?")) { await fetch(`${FB_URL}/${k}.json`, { method: 'DELETE' }); fetchCloudData(); } }
 
         function formatRupiah(el) {
             let v = el.value.replace(/\D/g, "");
@@ -238,20 +221,33 @@
             document.getElementById('mode-wd').className = m === 'WD' ? "flex-1 py-2.5 rounded-lg text-[9px] font-black bg-white text-red-600 shadow-sm" : "flex-1 py-2.5 rounded-lg text-[9px] font-black text-slate-400";
         }
 
+        // --- FUNGSI EXCEL TERBARU (SUDAH FIX TITIK RIBUAN) ---
         function downloadXLS() {
             if(rawData.length === 0) return;
+            
             const exportData = rawData.map(i => ({
                 "Tanggal": i.date,
                 "Waktu": i.time,
-                "Tipe": i.mode,
+                "Tipe": i.mode === 'UPDATE' ? 'MASUK' : 'KELUAR',
                 "Gateway": i.gw,
-                "Nominal": Number(i.nom),
+                "Nominal": Number(i.nom), // Harus dikonversi ke angka
                 "Keterangan": i.note || "-"
             }));
+
             const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Memberi format angka akuntansi (#,##0) pada kolom E (Nominal)
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for(let R = range.s.r + 1; R <= range.e.r; ++R) {
+                const cellAddress = XLSX.utils.encode_cell({r: R, c: 4}); // Kolom E (index 4)
+                if(!ws[cellAddress]) continue;
+                ws[cellAddress].t = 'n'; // Set tipe sebagai Number
+                ws[cellAddress].z = '#,##0'; // Format ribuan dengan titik/koma
+            }
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Rekap Laporan");
-            XLSX.writeFile(wb, `SawargiPay_v30_${new Date().getTime()}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan Keuangan");
+            XLSX.writeFile(wb, `SawargiPay_Final_${new Date().getTime()}.xlsx`);
         }
 
         function handleLogout() { sessionStorage.removeItem('spay_auth'); location.reload(); }
